@@ -644,7 +644,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   font-size: 56px;
   font-weight: 900;
   color: #263238;
@@ -1057,7 +1057,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-width: 540px;
+  max-width: 440px;
   width: 100%;
   margin: 0 auto;
   flex: 1;
@@ -1069,10 +1069,11 @@ body {
   background: white;
   border: 2px solid #ECEFF1;
   border-radius: 14px;
-  padding: 6px 24px;
+  padding: 6px 18px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 18px;
   transition: all 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
@@ -1080,11 +1081,13 @@ body {
 .rhythm-row-expr {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: flex-end;
+  gap: 10px;
   font-size: 24px;
   font-weight: bold;
   color: #78909C;
   letter-spacing: 1px;
+  min-width: 150px;
 }
 
 .rhythm-row-expr .op {
@@ -1092,7 +1095,7 @@ body {
 }
 
 .rhythm-row-ans {
-  min-width: 70px;
+  min-width: 76px;
   height: 40px;
   border: 2px dashed #CFD8DC;
   border-radius: 10px;
@@ -1123,6 +1126,8 @@ body {
   font-size: 32px;
   font-weight: 900;
   color: #263238;
+  min-width: 170px;
+  gap: 10px;
 }
 
 .rhythm-row.active .rhythm-row-expr .op {
