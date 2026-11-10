@@ -1104,13 +1104,19 @@ body {
   font-weight: bold;
 }
 
-/* ★ 굵고 큰 글씨로 3초간 주목받는 현재 활성 상태 */
+/* ★ 굵고 큰 글씨로 주목받는 현재 활성 상태 (손으로 터치하여 정답 공개) */
 .rhythm-row.active {
   background: #FFF9C4;
   border: 3px solid #FF9800;
   transform: scale(1.03);
   z-index: 5;
   box-shadow: 0 6px 20px rgba(255, 152, 0, 0.35);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.rhythm-row.active:active {
+  transform: scale(1.01);
 }
 
 .rhythm-row.active .rhythm-row-expr {
@@ -1127,19 +1133,35 @@ body {
   border: 3px dashed #FF9800;
   background: white;
   color: #E65100;
-  min-width: 76px;
+  min-width: 80px;
   height: 44px;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
 }
 
-/* 3초 동안 입으로 말하라고 안내하는 깜빡임 */
+/* 터치 유도 깜빡임 및 손가락 애니메이션 */
 .rhythm-row.active .thinking-dots {
   animation: blink 0.8s infinite;
   color: #FF5722;
 }
 
-/* ★ 4초에 정답이 짠! 공개된 상태 */
+.touch-hint-icon {
+  font-size: 15px;
+  animation: bounceTouch 0.8s infinite;
+  display: inline-block;
+  line-height: 1;
+}
+
+@keyframes bounceTouch {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px) scale(1.15); }
+}
+
+/* ★ 손으로 터치하여 정답이 짠! 공개된 상태 */
 .rhythm-row.revealed {
   background: #FFF3E0;
   border-color: #FF5722;
@@ -1152,7 +1174,12 @@ body {
   color: #D84315;
   font-size: 30px;
   font-weight: 900;
-  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.answer-pop {
+  display: inline-block;
+  animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* 이미 지나간 줄 (정답 보여준 상태로 유지) */
