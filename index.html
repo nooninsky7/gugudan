@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>신나는 구구단 탐험대 🚀</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 배경 장식 -->
+    <div class="bg-bubble b1"></div>
+    <div class="bg-bubble b2"></div>
+    <div class="bg-bubble b3"></div>
+
+    <!-- ================= 1. 메인 화면 (홈) ================= -->
+    <section id="screen-home" class="screen active">
+      <header class="app-header">
+        <div class="character-badge">
+          <span class="character-icon" id="user-avatar">🐥</span>
+          <div class="user-info">
+            <span class="user-level" id="user-title">구구단 새싹</span>
+            <span class="user-score">⭐ <span id="total-stars">0</span>개 모음</span>
+          </div>
+        </div>
+
+        <div class="header-center">
+          <h1 class="main-title">신나는 구구단 탐험대 🚀</h1>
+          <p class="sub-title">순간적으로 팡! 거꾸로도 척척!</p>
+        </div>
+
+        <div class="header-right">
+          <button class="btn-stampbook-open" onclick="openStampModal()" title="내 칭찬 도장판 보기">
+            💮 도장판 <span id="header-stamp-count">(0/20)</span>
+          </button>
+          <button class="btn-coupon-open" onclick="openCouponModal()" title="부모님 보상 쿠폰함">
+            🎁 쿠폰함
+          </button>
+          <button class="sound-toggle-btn" id="btn-sound-toggle" title="소리 켜기/끄기">🔊</button>
+        </div>
+      </header>
+
+      <!-- 단 선택 필터 바 -->
+      <div class="dan-selector-card">
+        <div class="card-label">🎯 연습할 단을 선택하세요! (여러 개 고를 수 있어요)</div>
+        <div class="dan-chips" id="dan-chips">
+          <button class="dan-chip active" data-dan="all">전체(2~9단)</button>
+          <button class="dan-chip" data-dan="2">2단</button>
+          <button class="dan-chip" data-dan="3">3단</button>
+          <button class="dan-chip" data-dan="4">4단</button>
+          <button class="dan-chip" data-dan="5">5단</button>
+          <button class="dan-chip" data-dan="6">6단</button>
+          <button class="dan-chip" data-dan="7">7단</button>
+          <button class="dan-chip" data-dan="8">8단</button>
+          <button class="dan-chip" data-dan="9">9단</button>
+        </div>
+      </div>
+
+      <!-- 리듬 외우기 모드 배너 (신규 기능) -->
+      <div class="rhythm-hero-card" onclick="openRhythmScreen(2)">
+        <div class="rhythm-hero-left">
+          <div class="rhythm-icon">🎶</div>
+          <div class="rhythm-info">
+            <div class="rhythm-badge">🗣️ 입으로 먼저 말하고 정답 확인!</div>
+            <h2>리듬 구구단 🎶</h2>
+            <p>1부터 9까지 순서대로 굵어지면 3초 안에 답을 말하고 4초에 정답 확인! (거꾸로도 가능)</p>
+          </div>
+        </div>
+        <button class="btn-rhythm-start">시작하기 ▶</button>
+      </div>
+
+      <!-- 게임 모드 카드 그리드 (핵심 4대 모드) -->
+      <div class="mode-grid">
+        <!-- 모드 1: 순간 반응 팡팡 -->
+        <button class="mode-card card-speed" onclick="startGame('speed')">
+          <span class="badge-recommend">강력추천</span>
+          <div class="mode-icon">⚡</div>
+          <div class="mode-text">
+            <h3>순간 반응 팡팡!</h3>
+            <p>문제가 나오면 바로 답하기! (순발력 훈련)</p>
+          </div>
+        </button>
+
+        <!-- 모드 2: 거꾸로 도전 -->
+        <button class="mode-card card-reverse" onclick="startGame('reverse')">
+          <span class="badge-special">역순마스터</span>
+          <div class="mode-icon">🔄</div>
+          <div class="mode-text">
+            <h3>거꾸로 도전!</h3>
+            <p>9부터 1까지 거꾸로 외워보기</p>
+          </div>
+        </button>
+
+        <!-- 모드 3: 구구단 탐정 (빈칸 채우기) -->
+        <button class="mode-card card-detective" onclick="startGame('missing')">
+          <div class="mode-icon">🕵️</div>
+          <div class="mode-text">
+            <h3>구구단 탐정</h3>
+            <p>7 × ❓ = 56 빈칸을 맞춰라!</p>
+          </div>
+        </button>
+
+        <!-- 모드 4: 차근차근 순서대로 -->
+        <button class="mode-card card-step" onclick="startGame('order')">
+          <div class="mode-icon">🌱</div>
+          <div class="mode-text">
+            <h3>차근차근 순서대로</h3>
+            <p>1부터 9까지 기본기 다지기</p>
+          </div>
+        </button>
+      </div>
+
+      <!-- 오답 복습 버튼 영역 -->
+      <div class="wrong-review-wrap" id="wrong-review-wrap" style="display: none;">
+        <button class="wrong-review-btn" id="btn-wrong-review" onclick="startGame('review')">
+          <span>🩹 틀린 문제 다시 풀기 (<span id="wrong-count">0</span>개)</span>
+        </button>
+        <button class="btn-clear-wrongs" onclick="resetWrongProblems(event)" title="틀린 문제 목록 리셋">
+          <span>🔄 리셋</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= 2. 게임 플레이 화면 (퀴즈 / 배틀) ================= -->
+    <section id="screen-game" class="screen">
+      <!-- 상단 바 -->
+      <div class="game-top-bar">
+        <button class="btn-icon" onclick="confirmExitGame()" title="처음으로 나가기">🏠 처음으로</button>
+
+        <!-- 퀴즈 화면 안에서 즉시 단을 바꿀 수 있는 탭 바 -->
+        <div class="in-game-dan-tabs" id="in-game-dan-tabs">
+          <button class="ingame-dan-btn" data-dan="all" onclick="changeGameDan('all')">전체</button>
+          <button class="ingame-dan-btn" data-dan="2" onclick="changeGameDan(2)">2단</button>
+          <button class="ingame-dan-btn" data-dan="3" onclick="changeGameDan(3)">3단</button>
+          <button class="ingame-dan-btn" data-dan="4" onclick="changeGameDan(4)">4단</button>
+          <button class="ingame-dan-btn" data-dan="5" onclick="changeGameDan(5)">5단</button>
+          <button class="ingame-dan-btn" data-dan="6" onclick="changeGameDan(6)">6단</button>
+          <button class="ingame-dan-btn" data-dan="7" onclick="changeGameDan(7)">7단</button>
+          <button class="ingame-dan-btn" data-dan="8" onclick="changeGameDan(8)">8단</button>
+          <button class="ingame-dan-btn" data-dan="9" onclick="changeGameDan(9)">9단</button>
+        </div>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="game-progress-bar"></div>
+        </div>
+        <span class="question-counter" id="question-counter">1 / 10</span>
+      </div>
+
+      <!-- 가로 분할 본문 -->
+      <div class="game-landscape-body">
+        <!-- 왼쪽 영역: 문제 카드, 콤보, 힌트, 메시지 -->
+        <div class="game-left-col">
+          <div class="combo-banner" id="combo-banner">연속 정답! 🔥 x<span id="combo-count">1</span></div>
+
+          <div class="quiz-card" id="quiz-card">
+            <div class="mode-indicator" id="game-mode-indicator">⚡ 순간 반응 팡팡</div>
+
+            <div class="expression-box" id="expression-box">
+              <span class="num-a" id="disp-num1">7</span>
+              <span class="op">×</span>
+              <span class="num-b" id="disp-num2">8</span>
+              <span class="eq">=</span>
+              <span class="answer-slot" id="disp-answer">?</span>
+            </div>
+
+            <div class="timer-gauge-wrap" id="timer-gauge-wrap">
+              <div class="timer-gauge" id="timer-gauge"></div>
+            </div>
+
+            <!-- 스마트 교육 힌트 3종 세트 -->
+            <div class="hint-container">
+              <button class="btn-hint" id="btn-hint" onclick="toggleHint()">💡 똑똑한 힌트 보기 (뒤집기 & 징검다리 & 그림)</button>
+              
+              <div class="hint-smart-card" id="hint-smart-card" style="display:none;">
+                <!-- 1. 교환법칙 뒤집기 힌트 -->
+                <div class="hint-item hint-reverse" id="hint-reverse-box">
+                  <span class="hint-tag">🔄 뒤집기 팁</span>
+                  <span class="hint-desc" id="hint-reverse-text">앞뒤를 바꿔도 같아요! <strong>8 × 7 = 56</strong></span>
+                </div>
+
+                <!-- 2. 징검다리 덧셈 힌트 -->
+                <div class="hint-item hint-bridge" id="hint-bridge-box">
+                  <span class="hint-tag">🪜 징검다리 팁</span>
+                  <span class="hint-desc" id="hint-bridge-text">7 × 7 = 49에 <strong>7을 한 번 더하면</strong> 56!</span>
+                </div>
+
+                <!-- 3. 시각적 바둑알 묶음 그림 -->
+                <div class="hint-visual" id="hint-visual"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 피드백 메시지 -->
+          <div class="feedback-msg" id="feedback-msg"></div>
+        </div>
+
+        <!-- 오른쪽 영역: 큼직하고 누르기 편한 태블릿 터치 키패드 -->
+        <div class="game-right-col">
+          <div class="keypad-container">
+            <div class="keypad">
+              <button class="key-btn" onclick="pressKey(1)">1</button>
+              <button class="key-btn" onclick="pressKey(2)">2</button>
+              <button class="key-btn" onclick="pressKey(3)">3</button>
+              <button class="key-btn" onclick="pressKey(4)">4</button>
+              <button class="key-btn" onclick="pressKey(5)">5</button>
+              <button class="key-btn" onclick="pressKey(6)">6</button>
+              <button class="key-btn" onclick="pressKey(7)">7</button>
+              <button class="key-btn" onclick="pressKey(8)">8</button>
+              <button class="key-btn" onclick="pressKey(9)">9</button>
+              <button class="key-btn key-clear" onclick="pressKey('clear')">지움 ⌫</button>
+              <button class="key-btn" onclick="pressKey(0)">0</button>
+              <button class="key-btn key-enter" onclick="submitAnswer()">입력 ✓</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 퀴즈 시작 전 또렷한 중앙 시작 버튼 (흐림 없음!) -->
+      <div class="game-start-overlay" id="game-start-overlay" onclick="startCurrentGamePlay()">
+        <button class="btn-giant-start">
+          <span style="font-size: 30px;">▶</span>
+          <span>문제 시작하기!</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= 3. 리듬 외우기 전용 화면 (소리내어 말하기) ================= -->
+    <section id="screen-rhythm" class="screen">
+      <!-- 상단 컨트롤 헤더 -->
+      <div class="rhythm-top-bar">
+        <button class="btn-icon" onclick="exitRhythmToHome()" title="처음으로 나가기">🏠 처음으로</button>
+
+        <!-- 단 선택 탭 (2단~9단) -->
+        <div class="rhythm-dan-tabs" id="rhythm-dan-tabs">
+          <button class="r-dan-btn active" onclick="selectRhythmDan(2)">2단</button>
+          <button class="r-dan-btn" onclick="selectRhythmDan(3)">3단</button>
+          <button class="r-dan-btn" onclick="selectRhythmDan(4)">4단</button>
+          <button class="r-dan-btn" onclick="selectRhythmDan(5)">5단</button>
+          <button class="r-dan-btn" onclick="selectRhythmDan(6)">6단</button>
+          <button class="r-dan-btn" onclick="selectRhythmDan(7)">7단</button>
+          <button class="r-dan-btn" onclick="selectRhythmDan(8)">8단</button>
+          <button class="r-dan-btn" onclick="selectRhythmDan(9)">9단</button>
+        </div>
+
+        <!-- 방향 토글 (순서대로 vs 거꾸로) -->
+        <div class="rhythm-dir-toggle">
+          <button class="dir-btn active" id="btn-dir-forward" onclick="setRhythmDirection('forward')">순서대로 (1➔9)</button>
+          <button class="dir-btn" id="btn-dir-reverse" onclick="setRhythmDirection('reverse')">거꾸로 (9➔1)</button>
+        </div>
+
+        <!-- 재생 컨트롤 -->
+        <div class="rhythm-controls">
+          <button class="ctrl-btn btn-play-pause btn-rhythm-main-act" id="btn-rhythm-play" onclick="handleRhythmStartOrToggle()">▶ 시작하기</button>
+          <button class="ctrl-btn" onclick="restartRhythm()">🔄 처음부터</button>
+        </div>
+      </div>
+
+      <!-- 안내 배너 -->
+      <div class="rhythm-status-banner">
+        <div class="rhythm-status-msg" id="rhythm-status-msg">
+          준비가 되면 상단의 <strong>[ ▶ 시작하기 ]</strong> 버튼을 눌러주세요!
+        </div>
+        <div class="rhythm-step-counter" id="rhythm-step-counter">0 / 9</div>
+      </div>
+
+      <!-- 위에서 아래로 1~9 순서대로 다 나오는 세로 List 보드 -->
+      <div class="rhythm-list-container" id="rhythm-board">
+        <!-- 9개의 세로 행(Row)이 렌더링됨 -->
+      </div>
+
+      <!-- 시작 전 큼직한 중앙 시작 버튼 오버레이 -->
+      <div class="rhythm-start-overlay" id="rhythm-start-overlay" onclick="handleRhythmStartOrToggle()">
+        <button class="btn-giant-start">
+          <span style="font-size: 32px;">▶</span>
+          <span>구구단 시작하기!</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= 4. 결과 화면 & 스탬프 ================= -->
+    <section id="screen-result" class="screen">
+      <div class="result-card">
+        <!-- 쾅! 찍히는 칭찬 스탬프 애니메이션 영역 -->
+        <div class="stamp-seal" id="result-stamp">
+          <div class="stamp-inner" id="result-stamp-inner">
+            <span class="stamp-text-sub">구구단 탐험대</span>
+            <span class="stamp-text-main" id="stamp-main-text">참 잘했어요</span>
+            <span class="stamp-text-date" id="stamp-date-text">100점 만점 💮</span>
+          </div>
+        </div>
+
+        <div class="result-avatar" id="result-avatar">🎉</div>
+        <h2 class="result-title" id="result-title">정말 멋져요!</h2>
+        <p class="result-subtitle" id="result-subtitle">오늘의 훈련 완료!</p>
+
+        <div class="score-board">
+          <div class="score-item">
+            <span class="score-label">맞힌 문제</span>
+            <span class="score-value highlight"><span id="res-correct">0</span> / <span id="res-total">10</span></span>
+          </div>
+          <div class="score-item">
+            <span class="score-label">획득 별</span>
+            <span class="score-value">⭐ +<span id="res-stars">0</span></span>
+          </div>
+          <div class="score-item">
+            <span class="score-label">최대 콤보</span>
+            <span class="score-value">🔥 <span id="res-max-combo">0</span>회</span>
+          </div>
+        </div>
+
+        <div class="result-wrong-list" id="result-wrong-list" style="display: none;">
+          <h4>📝 다시 확인할 문제</h4>
+          <div class="wrong-chips" id="wrong-chips-container"></div>
+        </div>
+
+        <div class="result-actions">
+          <button class="action-btn btn-retry" onclick="restartCurrentGame()">🔄 한 번 더 하기</button>
+          <button class="action-btn btn-home" onclick="goHome()">🏠 처음으로</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 5. 칭찬 스탬프판 모달 ================= -->
+    <div class="modal-overlay" id="stamp-modal" onclick="closeStampModal(event)">
+      <div class="modal-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2>💮 내 칭찬 스탬프판</h2>
+          <button class="modal-close-btn" onclick="closeStampModal()">✕</button>
+        </div>
+        <p class="modal-subtitle">한 판을 마칠 때마다 도장이 쾅! 20개를 모아 부모님 선물을 열어보세요 🎁</p>
+
+        <div class="stamp-board-grid" id="stamp-board-grid"></div>
+
+        <div class="modal-footer">
+          <span class="stamp-reward-msg" id="stamp-reward-msg">⭐ 도장을 10개, 20개 모으면 축하 선물이 열려요!</span>
+          <button class="btn-claim-reward" id="btn-claim-reward" onclick="claimRewardCoupon()" style="display:none;">
+            🎁 20개 완성! 부모님 선물 쿠폰 열기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 6. 부모님 보상 쿠폰함 설정 모달 ================= -->
+    <div class="modal-overlay" id="coupon-modal" onclick="closeCouponModal(event)">
+      <div class="modal-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2>🎁 부모님 보상 쿠폰함</h2>
+          <button class="modal-close-btn" onclick="closeCouponModal()">✕</button>
+        </div>
+        <p class="modal-subtitle">도장 20개를 모았을 때 아이에게 줄 실제 보상을 정해주세요!</p>
+
+        <div class="coupon-preset-list">
+          <label class="coupon-radio-label">
+            <input type="radio" name="coupon-choice" value="맛있는 아이스크림 먹기 🍦" checked>
+            <span>🍦 맛있는 아이스크림 먹기 쿠폰</span>
+          </label>
+          <label class="coupon-radio-label">
+            <input type="radio" name="coupon-choice" value="유튜브 자유 시청 30분 📱">
+            <span>📱 원하는 영상/유튜브 30분 자유 시청권</span>
+          </label>
+          <label class="coupon-radio-label">
+            <input type="radio" name="coupon-choice" value="부모님과 보드게임 1판 🎲">
+            <span>🎲 부모님과 좋아하는 보드게임 1판 하기</span>
+          </label>
+          <label class="coupon-radio-label">
+            <input type="radio" name="coupon-choice" value="원하는 간식 마트에서 고르기 🍫">
+            <span>🍫 마트에서 원하는 과자/간식 1개 고르기</span>
+          </label>
+          <label class="coupon-radio-label">
+            <input type="radio" name="coupon-choice" value="custom">
+            <span>✏️ 직접 적기:</span>
+            <input type="text" id="coupon-custom-text" placeholder="예: 키즈카페 가기" class="coupon-custom-input">
+          </label>
+        </div>
+
+        <div class="modal-footer" style="margin-top: 16px;">
+          <button class="action-btn btn-retry" onclick="saveCouponSetting()" style="width: 100%;">
+            💾 쿠폰 보상 저장하기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 7. 선물 개봉 축하 모달 (쿠폰 열람) ================= -->
+    <div class="modal-overlay" id="reward-open-modal" onclick="closeRewardModal(event)">
+      <div class="modal-card reward-ticket-card" onclick="event.stopPropagation()">
+        <div class="ticket-header">🎊 축하합니다! 도장 20개 완성 🎊</div>
+        <div class="ticket-badge">✨ 특 별 보 상 쿠 폰 ✨</div>
+        <div class="ticket-content" id="ticket-content-text">🍦 맛있는 아이스크림 먹기 쿠폰</div>
+        <p class="ticket-sub">부모님께 이 화면을 보여드리고 약속한 선물을 받으세요!</p>
+        <button class="action-btn btn-retry" onclick="closeRewardModal()" style="margin-top: 14px; width: 100%;">
+          고마워요! 신나요! 💖
+        </button>
+      </div>
+    </div>
+
+    <!-- 캔버스 (폭죽 파티클 효과) -->
+    <canvas id="confetti-canvas"></canvas>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
