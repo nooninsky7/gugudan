@@ -1294,7 +1294,7 @@ function startRhythmStep() {
     currentRow.classList.add('active');
     const ansSlot = document.getElementById(`r-ans-${idx}`);
     if (ansSlot) {
-      ansSlot.innerHTML = `<span class="thinking-dots">?</span><span class="touch-hint-icon">👆</span>`;
+      ansSlot.innerHTML = `<span class="thinking-dots">?</span>`;
     }
   }
 
