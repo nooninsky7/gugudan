@@ -1,0 +1,3377 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>신나는 구구단 탐험대 🚀</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --primary: #FF7043;
+  --primary-light: #FFAB91;
+  --secondary: #42A5F5;
+  --accent-yellow: #FFD54F;
+  --accent-green: #66BB6A;
+  --accent-purple: #AB47BC;
+  --bg-gradient: linear-gradient(135deg, #FFF9C4 0%, #E1F5FE 50%, #F3E5F5 100%);
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --text-main: #37474F;
+  --text-muted: #78909C;
+  --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.08);
+  --shadow-btn: 0 5px 14px rgba(0, 0, 0, 0.12);
+  --radius-lg: 28px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+body {
+  font-family: 'Jua', 'Noto Sans KR', sans-serif;
+  background: var(--bg-gradient);
+  min-height: 100vh;
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+  position: relative;
+  padding: 16px;
+}
+
+/* 배경 장식 원 */
+.bg-bubble {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.35;
+  filter: blur(30px);
+  z-index: 0;
+}
+.b1 { width: 360px; height: 360px; background: #FFE082; top: -60px; left: -60px; }
+.b2 { width: 420px; height: 420px; background: #81D4FA; bottom: -100px; right: -80px; }
+.b3 { width: 260px; height: 260px; background: #F48FB1; top: 30%; right: 5%; }
+
+/* 태블릿 가로 맞춤 앱 컨테이너 */
+#app {
+  width: 100%;
+  max-width: 1100px;
+  min-height: 640px;
+  height: 94vh;
+  max-height: 840px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 28px;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border-radius: 36px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  overflow: hidden;
+}
+
+/* 화면 전환 */
+.screen {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  animation: fadeIn 0.2s ease-out forwards;
+}
+.screen.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================= 1. 메인 화면 ================= */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.character-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 6px 16px;
+  border-radius: 40px;
+  box-shadow: var(--shadow-soft);
+}
+
+.character-icon {
+  font-size: 30px;
+  animation: bounce 2s infinite ease-in-out;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-level {
+  font-size: 16px;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.user-score {
+  font-size: 14px;
+  color: #FFA000;
+  font-weight: bold;
+}
+
+.header-center {
+  text-align: center;
+}
+
+.main-title {
+  font-size: 30px;
+  color: #2E3A59;
+  letter-spacing: -0.5px;
+  text-shadow: 1px 1px 0 #fff;
+}
+
+.sub-title {
+  font-size: 14px;
+  color: #5C6BC0;
+  margin-top: 1px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-stampbook-open {
+  background: #FFF8E1;
+  border: 2px solid #FFB300;
+  color: #E65100;
+  padding: 8px 14px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.1s;
+}
+.btn-stampbook-open:active { transform: scale(0.95); }
+
+.btn-coupon-open {
+  background: #F3E5F5;
+  border: 2px solid #AB47BC;
+  color: #6A1B9A;
+  padding: 8px 14px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.1s;
+}
+.btn-coupon-open:active { transform: scale(0.95); }
+
+.sound-toggle-btn {
+  background: white;
+  border: none;
+  font-size: 22px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.1s;
+}
+.sound-toggle-btn:active { transform: scale(0.92); }
+
+/* 단 선택 필터 */
+.dan-selector-card {
+  background: white;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 14px;
+}
+
+.card-label {
+  font-size: 14px;
+  color: #546E7A;
+  margin-bottom: 6px;
+  font-weight: bold;
+}
+
+.dan-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dan-chip {
+  background: #F0F4F8;
+  border: 2px solid transparent;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #455A64;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.15s ease;
+  flex: 1;
+  text-align: center;
+  min-width: 65px;
+}
+
+.dan-chip.active {
+  background: #FFF3E0;
+  border-color: #FF9800;
+  color: #E65100;
+  box-shadow: 0 4px 10px rgba(255, 152, 0, 0.25);
+  transform: translateY(-2px);
+}
+
+/* 리듬 외우기 모드 메인 배너 */
+.rhythm-hero-card {
+  background: linear-gradient(135deg, #FFF9C4 0%, #FFE082 100%);
+  border: 3px solid #FFCA28;
+  border-radius: var(--radius-lg);
+  padding: 16px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(255, 179, 0, 0.2);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.rhythm-hero-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(255, 179, 0, 0.3);
+}
+.rhythm-hero-card:active {
+  transform: scale(0.99);
+}
+
+.rhythm-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.rhythm-icon {
+  font-size: 40px;
+  width: 60px;
+  height: 60px;
+  background: white;
+  border-radius: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: var(--shadow-soft);
+  flex-shrink: 0;
+}
+
+.rhythm-badge {
+  display: inline-block;
+  background: #FF6F00;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 10px;
+  border-radius: 10px;
+  margin-bottom: 4px;
+}
+
+.rhythm-info h2 {
+  font-size: 20px;
+  color: #37474F;
+  margin-bottom: 2px;
+}
+
+.rhythm-info p {
+  font-size: 13px;
+  color: #795548;
+}
+
+.btn-rhythm-start {
+  background: #E65100;
+  color: white;
+  border: none;
+  font-size: 16px;
+  font-family: inherit;
+  font-weight: bold;
+  padding: 12px 22px;
+  border-radius: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.3);
+  flex-shrink: 0;
+  animation: pulse 1.6s infinite;
+}
+
+/* 4개 핵심 모드 카드 그리드 (2열 x 2행 시원한 태블릿 배치) */
+.mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  flex: 1;
+}
+
+.mode-card {
+  background: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  cursor: pointer;
+  position: relative;
+  text-align: left;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.12s, box-shadow 0.12s;
+  overflow: hidden;
+}
+
+.mode-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+}
+
+.mode-card:active {
+  transform: scale(0.98);
+}
+
+.mode-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+}
+
+.card-speed::before { background: #FF5722; }
+.card-reverse::before { background: #7C4DFF; }
+.card-detective::before { background: #00B0FF; }
+.card-step::before { background: #4CAF50; }
+
+.mode-icon {
+  font-size: 38px;
+  width: 64px;
+  height: 64px;
+  background: #F5F7FA;
+  border-radius: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.mode-text h3 {
+  font-size: 21px;
+  color: #263238;
+  margin-bottom: 5px;
+}
+
+.mode-text p {
+  font-size: 14px;
+  color: #78909C;
+  line-height: 1.3;
+}
+
+.badge-recommend, .badge-special, .badge-hot, .badge-new {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  color: white;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+.badge-recommend { background: #FF5722; }
+.badge-special { background: #7C4DFF; }
+.badge-hot { background: #E91E63; }
+.badge-new { background: #FFB300; }
+
+.wrong-review-wrap {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.wrong-review-btn {
+  margin-top: 0;
+  flex: 1;
+  background: #FFEBEE;
+  border: 2px dashed #EF5350;
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #C62828;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  animation: pulse 1.5s infinite;
+}
+
+.btn-clear-wrongs {
+  background: #ECEFF1;
+  border: 1px solid #CFD8DC;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #546E7A;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-clear-wrongs:hover {
+  background: #FFE0B2;
+  color: #E65100;
+  border-color: #FFB74D;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.015); }
+  100% { transform: scale(1); }
+}
+
+/* ================= 2. 게임 화면 & 몬스터 배틀 ================= */
+.game-top-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.in-game-dan-tabs {
+  display: flex;
+  gap: 4px;
+  background: white;
+  padding: 3px 8px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft);
+}
+
+.ingame-dan-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: bold;
+  color: #546E7A;
+  padding: 4px 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.ingame-dan-btn.active {
+  background: #FF7043;
+  color: white;
+  box-shadow: 0 2px 6px rgba(255, 112, 67, 0.4);
+}
+
+.btn-icon {
+  background: white;
+  border: none;
+  font-size: 15px;
+  font-family: inherit;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  color: #455A64;
+  transition: transform 0.1s;
+}
+.btn-icon:active { transform: scale(0.95); }
+
+.progress-container {
+  flex: 1;
+  height: 14px;
+  background: #E0E0E0;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #FFB300, #FF7043);
+  border-radius: 7px;
+  transition: width 0.3s ease;
+}
+
+.question-counter {
+  font-size: 17px;
+  font-weight: bold;
+  color: #455A64;
+  min-width: 65px;
+  text-align: right;
+}
+
+/* 가로 본문 컨테이너 */
+.game-landscape-body {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+  align-items: stretch;
+  min-height: 0;
+}
+
+.game-left-col {
+  flex: 1.3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.combo-banner {
+  height: 24px;
+  text-align: center;
+  font-size: 17px;
+  font-weight: bold;
+  color: #E64A19;
+  visibility: hidden;
+  margin-bottom: 6px;
+}
+.combo-banner.show {
+  visibility: visible;
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.quiz-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 18px 24px;
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.quiz-card.shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-10px); }
+  40%, 80% { transform: translateX(10px); }
+}
+
+.mode-indicator {
+  font-size: 14px;
+  color: #78909C;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+/* 우리말 리듬 챈트 & TTS 버튼 */
+.chant-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.chant-label {
+  font-size: 17px;
+  color: #3F51B5;
+  font-weight: bold;
+  background: #E8EAF6;
+  padding: 3px 12px;
+  border-radius: 14px;
+}
+
+.btn-tts {
+  background: #FFF9C4;
+  border: 1px solid #FBC02D;
+  border-radius: 12px;
+  padding: 3px 8px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: bold;
+  color: #F57F17;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.btn-tts:active { transform: scale(0.92); }
+
+.expression-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  font-size: 56px;
+  font-weight: 900;
+  color: #263238;
+  margin: 8px 0;
+}
+
+.expression-box .op { color: #FF7043; }
+.expression-box .eq { color: #90A4AE; }
+
+.answer-slot {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 80px;
+  height: 68px;
+  padding: 0 12px;
+  background: #FFF9C4;
+  border: 4px dashed #FBC02D;
+  border-radius: 16px;
+  color: #E65100;
+}
+.answer-slot.filled {
+  border-style: solid;
+  border-color: #FF9800;
+  background: #FFE082;
+}
+.answer-slot.missing-slot {
+  background: #E1F5FE;
+  border-color: #03A9F4;
+  color: #0277BD;
+}
+
+.timer-gauge-wrap {
+  width: 100%;
+  height: 8px;
+  background: #ECEFF1;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0 6px 0;
+}
+
+.timer-gauge {
+  height: 100%;
+  width: 100%;
+  background: #4CAF50;
+  transition: width 0.1s linear, background-color 0.3s;
+}
+
+/* 똑똑한 교육 힌트 3종 세트 */
+.hint-container {
+  margin-top: 8px;
+}
+
+.btn-hint {
+  background: none;
+  border: none;
+  color: #7E57C2;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 4px;
+}
+
+.hint-smart-card {
+  margin-top: 10px;
+  background: #FAF8FD;
+  border: 2px solid #D1C4E9;
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.hint-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.hint-reverse {
+  background: #E1F5FE;
+  color: #0277BD;
+}
+
+.hint-bridge {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.hint-tag {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.hint-visual {
+  padding: 8px;
+  background: #EDE7F6;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.hint-group-row {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.hint-group-label {
+  font-size: 12px;
+  color: #5E35B1;
+  width: 28px;
+}
+
+.hint-dot {
+  width: 18px;
+  height: 18px;
+  background: #7E57C2;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.feedback-msg {
+  height: 30px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 8px;
+}
+.feedback-msg.correct { color: #2E7D32; }
+.feedback-msg.wrong { color: #C62828; }
+
+/* 오른쪽 열: 키패드 */
+.game-right-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.keypad-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  height: 100%;
+  max-height: 350px;
+}
+
+.key-btn {
+  background: white;
+  border: none;
+  outline: none;
+  font-size: 30px;
+  font-family: inherit;
+  font-weight: bold;
+  color: #37474F;
+  border-radius: var(--radius-md);
+  box-shadow: 0 5px 0 #CFD8DC, var(--shadow-btn);
+  cursor: pointer;
+  transition: all 0.08s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 65px;
+}
+
+.key-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 #CFD8DC;
+}
+
+.key-clear {
+  background: #FFEBEE;
+  color: #D32F2F;
+  font-size: 20px;
+  box-shadow: 0 5px 0 #FFCDD2, var(--shadow-btn);
+}
+
+.key-enter {
+  background: #E8F5E9;
+  color: #2E7D32;
+  font-size: 20px;
+  box-shadow: 0 5px 0 #C8E6C9, var(--shadow-btn);
+}
+
+/* ================= 3. 리듬 외우기 전용 화면 ================= */
+.rhythm-top-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: nowrap;
+}
+
+.rhythm-dan-tabs {
+  display: flex;
+  gap: 6px;
+  background: white;
+  padding: 4px 8px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft);
+}
+
+.r-dan-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: bold;
+  color: #546E7A;
+  padding: 5px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.r-dan-btn.active {
+  background: #FF7043;
+  color: white;
+  box-shadow: 0 2px 6px rgba(255, 112, 67, 0.4);
+}
+
+.rhythm-dir-toggle {
+  display: flex;
+  background: white;
+  border-radius: 20px;
+  padding: 4px;
+  box-shadow: var(--shadow-soft);
+  gap: 4px;
+}
+
+.dir-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: bold;
+  color: #78909C;
+  padding: 5px 12px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+.dir-btn.active {
+  background: #7C4DFF;
+  color: white;
+  box-shadow: 0 2px 6px rgba(124, 77, 255, 0.4);
+}
+
+.rhythm-controls {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.ctrl-btn {
+  background: white;
+  border: 1px solid #CFD8DC;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: bold;
+  color: #37474F;
+  padding: 6px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.1s;
+}
+.ctrl-btn:active { transform: scale(0.95); }
+
+.btn-play-pause {
+  background: #FFF8E1;
+  border-color: #FFA000;
+  color: #E65100;
+}
+
+.btn-rhythm-main-act {
+  background: #FF7043;
+  border-color: #FF5722;
+  color: white;
+  box-shadow: 0 4px 10px rgba(255, 112, 67, 0.35);
+  animation: pulse 1.5s infinite;
+}
+
+/* 시작 전 또렷한 중앙 시작 버튼 (흐림 완전 제거!) */
+#screen-rhythm, #screen-game {
+  position: relative;
+}
+
+.rhythm-start-overlay, .game-start-overlay {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  backdrop-filter: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 30;
+  cursor: pointer;
+}
+
+.btn-giant-start {
+  background: linear-gradient(135deg, #FF6F00, #FFA000);
+  border: 3px solid white;
+  border-radius: 36px;
+  padding: 16px 36px;
+  color: white;
+  font-family: inherit;
+  font-size: 24px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(255, 111, 0, 0.5);
+  cursor: pointer;
+  animation: pulse 1.4s infinite;
+  transition: transform 0.12s;
+}
+.btn-giant-start:active {
+  transform: scale(0.95);
+}
+
+/* 완주 축하 세레모니 카드 */
+.ceremony-card {
+  text-align: center;
+  padding: 36px 30px;
+  background: #FFFDE7;
+  border: 4px solid #FFD54F;
+  max-width: 500px;
+}
+
+.ceremony-crown {
+  font-size: 72px;
+  animation: bounce 1.2s infinite ease-in-out;
+  margin-bottom: 8px;
+}
+
+.ceremony-title {
+  font-size: 30px;
+  color: #E65100;
+  margin-bottom: 8px;
+}
+
+.ceremony-desc {
+  font-size: 16px;
+  color: #5D4037;
+  margin-bottom: 14px;
+}
+
+.ceremony-badge {
+  display: inline-block;
+  background: white;
+  border: 2px solid #FFB300;
+  color: #FF8F00;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 8px 18px;
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+}
+
+.rhythm-status-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #FFFDE7;
+  border: 2px dashed #FBC02D;
+  border-radius: 16px;
+  padding: 8px 16px;
+  margin-bottom: 12px;
+}
+
+.rhythm-status-msg {
+  font-size: 15px;
+  color: #E65100;
+  font-weight: bold;
+}
+
+.rhythm-step-counter {
+  font-size: 14px;
+  font-weight: bold;
+  color: #F57F17;
+  background: white;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+/* 위에서 아래로 1~9 순서대로 다 나오는 세로 List 보드 */
+.rhythm-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 540px;
+  width: 100%;
+  margin: 0 auto;
+  flex: 1;
+  justify-content: space-between;
+  min-height: 0;
+}
+
+.rhythm-row {
+  background: white;
+  border: 2px solid #ECEFF1;
+  border-radius: 14px;
+  padding: 6px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.rhythm-row-expr {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #78909C;
+  letter-spacing: 1px;
+}
+
+.rhythm-row-expr .op {
+  color: #B0BEC5;
+}
+
+.rhythm-row-ans {
+  min-width: 70px;
+  height: 40px;
+  border: 2px dashed #CFD8DC;
+  border-radius: 10px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  color: #B0BEC5;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* ★ 굵고 큰 글씨로 3초간 주목받는 현재 활성 상태 */
+.rhythm-row.active {
+  background: #FFF9C4;
+  border: 3px solid #FF9800;
+  transform: scale(1.03);
+  z-index: 5;
+  box-shadow: 0 6px 20px rgba(255, 152, 0, 0.35);
+}
+
+.rhythm-row.active .rhythm-row-expr {
+  font-size: 32px;
+  font-weight: 900;
+  color: #263238;
+}
+
+.rhythm-row.active .rhythm-row-expr .op {
+  color: #FF7043;
+}
+
+.rhythm-row.active .rhythm-row-ans {
+  border: 3px dashed #FF9800;
+  background: white;
+  color: #E65100;
+  min-width: 76px;
+  height: 44px;
+  font-size: 26px;
+  font-weight: 900;
+}
+
+/* 3초 동안 입으로 말하라고 안내하는 깜빡임 */
+.rhythm-row.active .thinking-dots {
+  animation: blink 0.8s infinite;
+  color: #FF5722;
+}
+
+/* ★ 4초에 정답이 짠! 공개된 상태 */
+.rhythm-row.revealed {
+  background: #FFF3E0;
+  border-color: #FF5722;
+}
+
+.rhythm-row.revealed .rhythm-row-ans {
+  border-style: solid;
+  border-color: #E65100;
+  background: #FFCC80;
+  color: #D84315;
+  font-size: 30px;
+  font-weight: 900;
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 이미 지나간 줄 (정답 보여준 상태로 유지) */
+.rhythm-row.done {
+  background: #F1F8E9;
+  border-color: #C5E1A5;
+  opacity: 0.85;
+}
+.rhythm-row.done .rhythm-row-expr {
+  font-size: 22px;
+  color: #558B2F;
+}
+.rhythm-row.done .rhythm-row-ans {
+  border-style: solid;
+  border-color: #8BC34A;
+  background: #DCEDC8;
+  color: #33691E;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* ================= 3. 결과 화면 & 스탬프 ================= */
+.result-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 30px 36px;
+  text-align: center;
+  box-shadow: var(--shadow-soft);
+  max-width: 600px;
+  width: 100%;
+  margin: auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.stamp-seal {
+  position: absolute;
+  top: 20px;
+  right: 28px;
+  width: 114px;
+  height: 114px;
+  border: 4px dashed #D32F2F;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #D32F2F;
+  transform: rotate(-15deg) scale(0);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: inset 0 0 0 3px rgba(211, 47, 47, 0.2);
+}
+
+.stamp-seal.gold {
+  border-color: #E65100;
+  color: #E65100;
+  box-shadow: inset 0 0 0 3px rgba(230, 81, 0, 0.2);
+}
+
+.stamp-seal.stamped {
+  animation: stampSlam 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.4) forwards;
+}
+
+@keyframes stampSlam {
+  0% { transform: rotate(-35deg) scale(3.5); opacity: 0; }
+  70% { transform: rotate(-12deg) scale(0.9); opacity: 0.95; }
+  100% { transform: rotate(-14deg) scale(1); opacity: 0.9; }
+}
+
+.stamp-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  width: 98px;
+  height: 98px;
+}
+
+.stamp-text-sub {
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.stamp-text-main {
+  font-size: 18px;
+  font-weight: 900;
+  margin: 2px 0;
+}
+
+.stamp-text-date {
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.result-avatar {
+  font-size: 68px;
+  margin-bottom: 8px;
+  animation: bounce 1.2s infinite;
+}
+
+.result-title {
+  font-size: 30px;
+  color: #263238;
+  margin-bottom: 4px;
+}
+
+.result-subtitle {
+  font-size: 16px;
+  color: #78909C;
+  margin-bottom: 20px;
+}
+
+.score-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  background: #F9FAFB;
+  border-radius: var(--radius-md);
+  padding: 16px 12px;
+  margin-bottom: 20px;
+}
+
+.score-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.score-label {
+  font-size: 13px;
+  color: #90A4AE;
+}
+
+.score-value {
+  font-size: 20px;
+  font-weight: bold;
+  color: #37474F;
+}
+
+.score-value.highlight {
+  color: #E65100;
+  font-size: 22px;
+}
+
+.result-wrong-list {
+  text-align: left;
+  background: #FFF8E1;
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.result-wrong-list h4 {
+  font-size: 14px;
+  color: #F57F17;
+  margin-bottom: 8px;
+}
+
+.wrong-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wrong-chip {
+  background: white;
+  border: 1px solid #FFE082;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 15px;
+  color: #E65100;
+  font-weight: bold;
+}
+
+.result-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.action-btn {
+  flex: 1;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  font-size: 18px;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.action-btn:active { transform: scale(0.98); }
+
+.btn-retry {
+  background: #FF7043;
+  color: white;
+  box-shadow: 0 5px 14px rgba(255, 112, 67, 0.4);
+}
+
+.btn-home {
+  background: #ECEFF1;
+  color: #546E7A;
+}
+
+/* ================= 5. 모달 및 보상 쿠폰 ================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+.modal-overlay.open {
+  display: flex;
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.modal-card {
+  background: #FFFDF7;
+  border-radius: 28px;
+  padding: 24px 28px;
+  max-width: 660px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  border: 3px solid #FFE082;
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.modal-header h2 {
+  font-size: 22px;
+  color: #E65100;
+}
+
+.modal-close-btn {
+  background: #ECEFF1;
+  border: none;
+  font-size: 18px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #546E7A;
+}
+
+.modal-subtitle {
+  font-size: 14px;
+  color: #78909C;
+  margin-bottom: 14px;
+}
+
+.stamp-board-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.stamp-slot {
+  background: white;
+  border: 2px dashed #CFD8DC;
+  border-radius: 14px;
+  height: 58px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.stamp-slot.milestone {
+  border-color: #FFB300;
+  background: #FFFDE7;
+}
+
+.stamp-slot-num {
+  font-size: 11px;
+  color: #B0BEC5;
+  font-weight: bold;
+}
+
+.stamp-slot.stamped {
+  border-style: solid;
+  border-color: #EF5350;
+  background: #FFEBEE;
+}
+
+.stamp-slot-mark {
+  font-size: 24px;
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-claim-reward {
+  margin-top: 10px;
+  width: 100%;
+  background: linear-gradient(135deg, #FF6F00, #FFA000);
+  border: none;
+  border-radius: 16px;
+  padding: 14px;
+  font-size: 18px;
+  font-family: inherit;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(255, 160, 0, 0.4);
+  animation: pulse 1.5s infinite;
+}
+
+/* 쿠폰 프리셋 리스트 */
+.coupon-preset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.coupon-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 2px solid #EDE7F6;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.coupon-radio-label input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #AB47BC;
+}
+
+.coupon-custom-input {
+  border: 1px solid #B0BEC5;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  flex: 1;
+}
+
+/* 황금 보상 티켓 카드 */
+.reward-ticket-card {
+  background: #FFFDE7;
+  border: 4px dashed #FFB300;
+  text-align: center;
+  padding: 30px;
+}
+
+.ticket-header {
+  font-size: 16px;
+  color: #F57F17;
+  font-weight: bold;
+}
+
+.ticket-badge {
+  font-size: 22px;
+  font-weight: 900;
+  color: #D84315;
+  margin: 10px 0;
+}
+
+.ticket-content {
+  background: white;
+  border: 2px solid #FFD54F;
+  border-radius: 16px;
+  padding: 20px;
+  font-size: 24px;
+  font-weight: 900;
+  color: #E65100;
+  box-shadow: 0 6px 18px rgba(255, 179, 0, 0.25);
+  margin: 14px 0;
+}
+
+.ticket-sub {
+  font-size: 14px;
+  color: #78909C;
+}
+
+/* 폭죽 캔버스 */
+#confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@media (max-width: 768px) {
+  #app {
+    padding: 14px;
+    height: 100vh;
+    border-radius: 0;
+  }
+  .game-landscape-body {
+    flex-direction: column;
+  }
+  .mode-grid {
+    grid-template-columns: 1fr;
+  }
+  .card-board {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+</style>
+</head>
+<body>
+  <div id="app">
+    <!-- 배경 장식 -->
+    <div class="bg-bubble b1"></div>
+    <div class="bg-bubble b2"></div>
+    <div class="bg-bubble b3"></div>
+
+    <!-- ================= 1. 메인 화면 (홈) ================= -->
+    <section id="screen-home" class="screen active">
+      <header class="app-header">
+        <div class="character-badge">
+          <span class="character-icon" id="user-avatar">🐥</span>
+          <div class="user-info">
+            <span class="user-level" id="user-title">구구단 새싹</span>
+            <span class="user-score">⭐ <span id="total-stars">0</span>개 모음</span>
+          </div>
+        </div>
+
+        <div class="header-center">
+          <h1 class="main-title">신나는 구구단 탐험대 🚀</h1>
+          <p class="sub-title">순간적으로 팡! 거꾸로도 척척!</p>
+        </div>
+
+        <div class="header-right">
+          <button class="btn-stampbook-open" onclick="openStampModal()" title="내 칭찬 도장판 보기">
+            💮 도장판 <span id="header-stamp-count">(0/20)</span>
+          </button>
+          <button class="btn-coupon-open" onclick="openCouponModal()" title="부모님 보상 쿠폰함">
+            🎁 쿠폰함
+          </button>
+          <button class="sound-toggle-btn" id="btn-sound-toggle" title="소리 켜기/끄기">🔊</button>
+        </div>
+      </header>
+
+      <!-- 단 선택 필터 바 -->
+      <div class="dan-selector-card">
+        <div class="card-label">🎯 연습할 단을 선택하세요! (여러 개 고를 수 있어요)</div>
+        <div class="dan-chips" id="dan-chips">
+          <button class="dan-chip active" data-dan="all">전체(2~9단)</button>
+          <button class="dan-chip" data-dan="2">2단</button>
+          <button class="dan-chip" data-dan="3">3단</button>
+          <button class="dan-chip" data-dan="4">4단</button>
+          <button class="dan-chip" data-dan="5">5단</button>
+          <button class="dan-chip" data-dan="6">6단</button>
+          <button class="dan-chip" data-dan="7">7단</button>
+          <button class="dan-chip" data-dan="8">8단</button>
+          <button class="dan-chip" data-dan="9">9단</button>
+        </div>
+      </div>
+
+      <!-- 리듬 외우기 모드 배너 (신규 기능) -->
+      <div class="rhythm-hero-card" onclick="openRhythmScreen(2)">
+        <div class="rhythm-hero-left">
+          <div class="rhythm-icon">🎶</div>
+          <div class="rhythm-info">
+            <div class="rhythm-badge">🗣️ 입으로 먼저 말하고 정답 확인!</div>
+            <h2>리듬 구구단 🎶</h2>
+            <p>1부터 9까지 순서대로 굵어지면 3초 안에 답을 말하고 4초에 정답 확인! (거꾸로도 가능)</p>
+          </div>
+        </div>
+        <button class="btn-rhythm-start">시작하기 ▶</button>
+      </div>
+
+      <!-- 게임 모드 카드 그리드 (핵심 4대 모드) -->
+      <div class="mode-grid">
+        <!-- 모드 1: 순간 반응 팡팡 -->
+        <button class="mode-card card-speed" onclick="startGame('speed')">
+          <span class="badge-recommend">강력추천</span>
+          <div class="mode-icon">⚡</div>
+          <div class="mode-text">
+            <h3>순간 반응 팡팡!</h3>
+            <p>문제가 나오면 바로 답하기! (순발력 훈련)</p>
+          </div>
+        </button>
+
+        <!-- 모드 2: 거꾸로 도전 -->
+        <button class="mode-card card-reverse" onclick="startGame('reverse')">
+          <span class="badge-special">역순마스터</span>
+          <div class="mode-icon">🔄</div>
+          <div class="mode-text">
+            <h3>거꾸로 도전!</h3>
+            <p>9부터 1까지 거꾸로 외워보기</p>
+          </div>
+        </button>
+
+        <!-- 모드 3: 구구단 탐정 (빈칸 채우기) -->
+        <button class="mode-card card-detective" onclick="startGame('missing')">
+          <div class="mode-icon">🕵️</div>
+          <div class="mode-text">
+            <h3>구구단 탐정</h3>
+            <p>7 × ❓ = 56 빈칸을 맞춰라!</p>
+          </div>
+        </button>
+
+        <!-- 모드 4: 차근차근 순서대로 -->
+        <button class="mode-card card-step" onclick="startGame('order')">
+          <div class="mode-icon">🌱</div>
+          <div class="mode-text">
+            <h3>차근차근 순서대로</h3>
+            <p>1부터 9까지 기본기 다지기</p>
+          </div>
+        </button>
+      </div>
+
+      <!-- 오답 복습 버튼 영역 -->
+      <div class="wrong-review-wrap" id="wrong-review-wrap" style="display: none;">
+        <button class="wrong-review-btn" id="btn-wrong-review" onclick="startGame('review')">
+          <span>🩹 틀린 문제 다시 풀기 (<span id="wrong-count">0</span>개)</span>
+        </button>
+        <button class="btn-clear-wrongs" onclick="resetWrongProblems(event)" title="틀린 문제 목록 리셋">
+          <span>🔄 리셋</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= 2. 게임 플레이 화면 (퀴즈 / 배틀) ================= -->
+    <section id="screen-game" class="screen">
+      <!-- 상단 바 -->
+      <div class="game-top-bar">
+        <button class="btn-icon" onclick="confirmExitGame()" title="처음으로 나가기">🏠 처음으로</button>
+
+        <!-- 퀴즈 화면 안에서 즉시 단을 바꿀 수 있는 탭 바 -->
+        <div class="in-game-dan-tabs" id="in-game-dan-tabs">
+          <button class="ingame-dan-btn" data-dan="all" onclick="changeGameDan('all')">전체</button>
+          <button class="ingame-dan-btn" data-dan="2" onclick="changeGameDan(2)">2단</button>
+          <button class="ingame-dan-btn" data-dan="3" onclick="changeGameDan(3)">3단</button>
+          <button class="ingame-dan-btn" data-dan="4" onclick="changeGameDan(4)">4단</button>
+          <button class="ingame-dan-btn" data-dan="5" onclick="changeGameDan(5)">5단</button>
+          <button class="ingame-dan-btn" data-dan="6" onclick="changeGameDan(6)">6단</button>
+          <button class="ingame-dan-btn" data-dan="7" onclick="changeGameDan(7)">7단</button>
+          <button class="ingame-dan-btn" data-dan="8" onclick="changeGameDan(8)">8단</button>
+          <button class="ingame-dan-btn" data-dan="9" onclick="changeGameDan(9)">9단</button>
+        </div>
+
+        <div class="progress-container">
+          <div class="progress-bar" id="game-progress-bar"></div>
+        </div>
+        <span class="question-counter" id="question-counter">1 / 10</span>
+      </div>
+
+      <!-- 가로 분할 본문 -->
+      <div class="game-landscape-body">
+        <!-- 왼쪽 영역: 문제 카드, 콤보, 힌트, 메시지 -->
+        <div class="game-left-col">
+          <div class="combo-banner" id="combo-banner">연속 정답! 🔥 x<span id="combo-count">1</span></div>
+
+          <div class="quiz-card" id="quiz-card">
+            <div class="mode-indicator" id="game-mode-indicator">⚡ 순간 반응 팡팡</div>
+
+            <div class="expression-box" id="expression-box">
+              <span class="num-a" id="disp-num1">7</span>
+              <span class="op">×</span>
+              <span class="num-b" id="disp-num2">8</span>
+              <span class="eq">=</span>
+              <span class="answer-slot" id="disp-answer">?</span>
+            </div>
+
+            <div class="timer-gauge-wrap" id="timer-gauge-wrap">
+              <div class="timer-gauge" id="timer-gauge"></div>
+            </div>
+
+            <!-- 스마트 교육 힌트 3종 세트 -->
+            <div class="hint-container">
+              <button class="btn-hint" id="btn-hint" onclick="toggleHint()">💡 똑똑한 힌트 보기 (뒤집기 & 징검다리 & 그림)</button>
+              
+              <div class="hint-smart-card" id="hint-smart-card" style="display:none;">
+                <!-- 1. 교환법칙 뒤집기 힌트 -->
+                <div class="hint-item hint-reverse" id="hint-reverse-box">
+                  <span class="hint-tag">🔄 뒤집기 팁</span>
+                  <span class="hint-desc" id="hint-reverse-text">앞뒤를 바꿔도 같아요! <strong>8 × 7 = 56</strong></span>
+                </div>
+
+                <!-- 2. 징검다리 덧셈 힌트 -->
+                <div class="hint-item hint-bridge" id="hint-bridge-box">
+                  <span class="hint-tag">🪜 징검다리 팁</span>
+                  <span class="hint-desc" id="hint-bridge-text">7 × 7 = 49에 <strong>7을 한 번 더하면</strong> 56!</span>
+                </div>
+
+                <!-- 3. 시각적 바둑알 묶음 그림 -->
+                <div class="hint-visual" id="hint-visual"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 피드백 메시지 -->
+          <div class="feedback-msg" id="feedback-msg"></div>
+        </div>
+
+        <!-- 오른쪽 영역: 큼직하고 누르기 편한 태블릿 터치 키패드 -->
+        <div class="game-right-col">
+          <div class="keypad-container">
+            <div class="keypad">
+              <button class="key-btn" onclick="pressKey(1)">1</button>
+              <button class="key-btn" onclick="pressKey(2)">2</button>
+              <button class="key-btn" onclick="pressKey(3)">3</button>
+              <button class="key-btn" onclick="pressKey(4)">4</button>
+              <button class="key-btn" onclick="pressKey(5)">5</button>
+              <button class="key-btn" onclick="pressKey(6)">6</button>
+              <button class="key-btn" onclick="pressKey(7)">7</button>
+              <button class="key-btn" onclick="pressKey(8)">8</button>
+              <button class="key-btn" onclick="pressKey(9)">9</button>
+              <button class="key-btn key-clear" onclick="pressKey('clear')">지움 ⌫</button>
+              <button class="key-btn" onclick="pressKey(0)">0</button>
+              <button class="key-btn key-enter" onclick="submitAnswer()">입력 ✓</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 퀴즈 시작 전 또렷한 중앙 시작 버튼 (흐림 없음!) -->
+      <div class="game-start-overlay" id="game-start-overlay" onclick="startCurrentGamePlay()">
+        <button class="btn-giant-start">
+          <span style="font-size: 30px;">▶</span>
+          <span>문제 시작하기!</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= 3. 리듬 외우기 전용 화면 (소리내어 말하기) ================= -->
+    <section id="screen-rhythm" class="screen">
+      <!-- 상단 컨트롤 헤더 -->
+      <div class="rhythm-top-bar">
+        <button class="btn-icon" onclick="exitRhythmToHome()" title="처음으로 나가기">🏠 처음으로</button>
+
+        <!-- 단 선택 탭 (2단~9단) -->
+        <div class="rhythm-dan-tabs" id="rhythm-dan-tabs">
+          <button class="r-dan-btn active" onclick="selectRhythmDan(2)">2단</button>
+          <button class="r-dan-btn" onclick="selectRhythmDan(3)">3단</button>
+          <button class="r-dan-btn" onclick="selectRhythmDan(4)">4단</button>
+          <button class="r-dan-btn" onclick="selectRhythmDan(5)">5단</button>
+          <button class="r-dan-btn" onclick="selectRhythmDan(6)">6단</button>
+          <button class="r-dan-btn" onclick="selectRhythmDan(7)">7단</button>
+          <button class="r-dan-btn" onclick="selectRhythmDan(8)">8단</button>
+          <button class="r-dan-btn" onclick="selectRhythmDan(9)">9단</button>
+        </div>
+
+        <!-- 방향 토글 (순서대로 vs 거꾸로) -->
+        <div class="rhythm-dir-toggle">
+          <button class="dir-btn active" id="btn-dir-forward" onclick="setRhythmDirection('forward')">순서대로 (1➔9)</button>
+          <button class="dir-btn" id="btn-dir-reverse" onclick="setRhythmDirection('reverse')">거꾸로 (9➔1)</button>
+        </div>
+
+        <!-- 재생 컨트롤 -->
+        <div class="rhythm-controls">
+          <button class="ctrl-btn btn-play-pause btn-rhythm-main-act" id="btn-rhythm-play" onclick="handleRhythmStartOrToggle()">▶ 시작하기</button>
+          <button class="ctrl-btn" onclick="restartRhythm()">🔄 처음부터</button>
+        </div>
+      </div>
+
+      <!-- 안내 배너 -->
+      <div class="rhythm-status-banner">
+        <div class="rhythm-status-msg" id="rhythm-status-msg">
+          준비가 되면 상단의 <strong>[ ▶ 시작하기 ]</strong> 버튼을 눌러주세요!
+        </div>
+        <div class="rhythm-step-counter" id="rhythm-step-counter">0 / 9</div>
+      </div>
+
+      <!-- 위에서 아래로 1~9 순서대로 다 나오는 세로 List 보드 -->
+      <div class="rhythm-list-container" id="rhythm-board">
+        <!-- 9개의 세로 행(Row)이 렌더링됨 -->
+      </div>
+
+      <!-- 시작 전 큼직한 중앙 시작 버튼 오버레이 -->
+      <div class="rhythm-start-overlay" id="rhythm-start-overlay" onclick="handleRhythmStartOrToggle()">
+        <button class="btn-giant-start">
+          <span style="font-size: 32px;">▶</span>
+          <span>구구단 시작하기!</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= 4. 결과 화면 & 스탬프 ================= -->
+    <section id="screen-result" class="screen">
+      <div class="result-card">
+        <!-- 쾅! 찍히는 칭찬 스탬프 애니메이션 영역 -->
+        <div class="stamp-seal" id="result-stamp">
+          <div class="stamp-inner" id="result-stamp-inner">
+            <span class="stamp-text-sub">구구단 탐험대</span>
+            <span class="stamp-text-main" id="stamp-main-text">참 잘했어요</span>
+            <span class="stamp-text-date" id="stamp-date-text">100점 만점 💮</span>
+          </div>
+        </div>
+
+        <div class="result-avatar" id="result-avatar">🎉</div>
+        <h2 class="result-title" id="result-title">정말 멋져요!</h2>
+        <p class="result-subtitle" id="result-subtitle">오늘의 훈련 완료!</p>
+
+        <div class="score-board">
+          <div class="score-item">
+            <span class="score-label">맞힌 문제</span>
+            <span class="score-value highlight"><span id="res-correct">0</span> / <span id="res-total">10</span></span>
+          </div>
+          <div class="score-item">
+            <span class="score-label">획득 별</span>
+            <span class="score-value">⭐ +<span id="res-stars">0</span></span>
+          </div>
+          <div class="score-item">
+            <span class="score-label">최대 콤보</span>
+            <span class="score-value">🔥 <span id="res-max-combo">0</span>회</span>
+          </div>
+        </div>
+
+        <div class="result-wrong-list" id="result-wrong-list" style="display: none;">
+          <h4>📝 다시 확인할 문제</h4>
+          <div class="wrong-chips" id="wrong-chips-container"></div>
+        </div>
+
+        <div class="result-actions">
+          <button class="action-btn btn-retry" onclick="restartCurrentGame()">🔄 한 번 더 하기</button>
+          <button class="action-btn btn-home" onclick="goHome()">🏠 처음으로</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 5. 칭찬 스탬프판 모달 ================= -->
+    <div class="modal-overlay" id="stamp-modal" onclick="closeStampModal(event)">
+      <div class="modal-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2>💮 내 칭찬 스탬프판</h2>
+          <button class="modal-close-btn" onclick="closeStampModal()">✕</button>
+        </div>
+        <p class="modal-subtitle">한 판을 마칠 때마다 도장이 쾅! 20개를 모아 부모님 선물을 열어보세요 🎁</p>
+
+        <div class="stamp-board-grid" id="stamp-board-grid"></div>
+
+        <div class="modal-footer">
+          <span class="stamp-reward-msg" id="stamp-reward-msg">⭐ 도장을 10개, 20개 모으면 축하 선물이 열려요!</span>
+          <button class="btn-claim-reward" id="btn-claim-reward" onclick="claimRewardCoupon()" style="display:none;">
+            🎁 20개 완성! 부모님 선물 쿠폰 열기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 6. 부모님 보상 쿠폰함 설정 모달 ================= -->
+    <div class="modal-overlay" id="coupon-modal" onclick="closeCouponModal(event)">
+      <div class="modal-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2>🎁 부모님 보상 쿠폰함</h2>
+          <button class="modal-close-btn" onclick="closeCouponModal()">✕</button>
+        </div>
+        <p class="modal-subtitle">도장 20개를 모았을 때 아이에게 줄 실제 보상을 정해주세요!</p>
+
+        <div class="coupon-preset-list">
+          <label class="coupon-radio-label">
+            <input type="radio" name="coupon-choice" value="맛있는 아이스크림 먹기 🍦" checked>
+            <span>🍦 맛있는 아이스크림 먹기 쿠폰</span>
+          </label>
+          <label class="coupon-radio-label">
+            <input type="radio" name="coupon-choice" value="유튜브 자유 시청 30분 📱">
+            <span>📱 원하는 영상/유튜브 30분 자유 시청권</span>
+          </label>
+          <label class="coupon-radio-label">
+            <input type="radio" name="coupon-choice" value="부모님과 보드게임 1판 🎲">
+            <span>🎲 부모님과 좋아하는 보드게임 1판 하기</span>
+          </label>
+          <label class="coupon-radio-label">
+            <input type="radio" name="coupon-choice" value="원하는 간식 마트에서 고르기 🍫">
+            <span>🍫 마트에서 원하는 과자/간식 1개 고르기</span>
+          </label>
+          <label class="coupon-radio-label">
+            <input type="radio" name="coupon-choice" value="custom">
+            <span>✏️ 직접 적기:</span>
+            <input type="text" id="coupon-custom-text" placeholder="예: 키즈카페 가기" class="coupon-custom-input">
+          </label>
+        </div>
+
+        <div class="modal-footer" style="margin-top: 16px;">
+          <button class="action-btn btn-retry" onclick="saveCouponSetting()" style="width: 100%;">
+            💾 쿠폰 보상 저장하기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 7. 선물 개봉 축하 모달 (쿠폰 열람) ================= -->
+    <div class="modal-overlay" id="reward-open-modal" onclick="closeRewardModal(event)">
+      <div class="modal-card reward-ticket-card" onclick="event.stopPropagation()">
+        <div class="ticket-header">🎊 축하합니다! 도장 20개 완성 🎊</div>
+        <div class="ticket-badge">✨ 특 별 보 상 쿠 폰 ✨</div>
+        <div class="ticket-content" id="ticket-content-text">🍦 맛있는 아이스크림 먹기 쿠폰</div>
+        <p class="ticket-sub">부모님께 이 화면을 보여드리고 약속한 선물을 받으세요!</p>
+        <button class="action-btn btn-retry" onclick="closeRewardModal()" style="margin-top: 14px; width: 100%;">
+          고마워요! 신나요! 💖
+        </button>
+      </div>
+    </div>
+
+    <!-- 캔버스 (폭죽 파티클 효과) -->
+    <canvas id="confetti-canvas"></canvas>
+  </div>
+
+  <script>
+/**
+ * 신나는 구구단 탐험대 (Gugudan Adventure)
+ * 버그 전면 박멸 & 완벽 검증된 학습 스크립트
+ */
+
+// --- 1. 오디오 합성기 (Web Audio API) ---
+class SoundManager {
+  constructor() {
+    this.ctx = null;
+    this.muted = localStorage.getItem('gugudan_sound_muted') === 'true';
+    this.updateSoundBtn();
+  }
+
+  init() {
+    if (!this.ctx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AudioContext();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  toggle() {
+    this.muted = !this.muted;
+    localStorage.setItem('gugudan_sound_muted', this.muted);
+    this.updateSoundBtn();
+    if (!this.muted) {
+      this.playBeep(440, 0.1);
+    }
+  }
+
+  updateSoundBtn() {
+    const btn = document.getElementById('btn-sound-toggle');
+    if (btn) btn.textContent = this.muted ? '🔇' : '🔊';
+  }
+
+  playTone(freq, duration, type = 'sine', gainVal = 0.15) {
+    if (this.muted) return;
+    this.init();
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+      gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + duration);
+    } catch (e) {}
+  }
+
+  playBeep(freq = 520, duration = 0.05) {
+    this.playTone(freq, duration, 'triangle', 0.08);
+  }
+
+  playCorrect() {
+    if (this.muted) return;
+    this.init();
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, i) => {
+      setTimeout(() => {
+        this.playTone(freq, 0.22, 'triangle', 0.18);
+      }, i * 65);
+    });
+  }
+
+  playWrong() {
+    if (this.muted) return;
+    this.init();
+    this.playTone(330, 0.12, 'sawtooth', 0.08);
+    setTimeout(() => {
+      this.playTone(260, 0.2, 'sawtooth', 0.08);
+    }, 100);
+  }
+
+  playStamp() {
+    if (this.muted) return;
+    this.init();
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.25);
+
+      gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.25);
+    } catch (e) {}
+  }
+
+  playFanfare() {
+    if (this.muted) return;
+    this.init();
+    const fanfareNotes = [
+      { f: 523.25, d: 0.12, t: 0 },
+      { f: 523.25, d: 0.12, t: 140 },
+      { f: 523.25, d: 0.12, t: 280 },
+      { f: 659.25, d: 0.3,  t: 420 },
+      { f: 783.99, d: 0.5,  t: 700 }
+    ];
+    fanfareNotes.forEach(n => {
+      setTimeout(() => {
+        this.playTone(n.f, n.d, 'triangle', 0.22);
+      }, n.t);
+    });
+  }
+}
+
+const sounds = new SoundManager();
+
+// --- 2. 콘페티(폭죽 파티클) 시스템 ---
+class ConfettiEffect {
+  constructor(canvasId) {
+    this.canvas = document.getElementById(canvasId);
+    this.ctx = this.canvas.getContext('2d');
+    this.particles = [];
+    this.animationId = null;
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+  }
+
+  resize() {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+  }
+
+  burst(x = window.innerWidth / 2, y = window.innerHeight / 3, count = 50) {
+    const colors = ['#FF5722', '#FFCA28', '#42A5F5', '#66BB6A', '#AB47BC', '#EC407A'];
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 9 + 4;
+      this.particles.push({
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 3.5,
+        size: Math.random() * 9 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        life: 1,
+        decay: Math.random() * 0.02 + 0.012,
+        rotation: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 12
+      });
+    }
+
+    if (!this.animationId) {
+      this.animate();
+    }
+  }
+
+  animate() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.22;
+      p.life -= p.decay;
+      p.rotation += p.rotSpeed;
+
+      if (p.life <= 0) {
+        this.particles.splice(i, 1);
+        continue;
+      }
+
+      this.ctx.save();
+      this.ctx.translate(p.x, p.y);
+      this.ctx.rotate((p.rotation * Math.PI) / 180);
+      this.ctx.fillStyle = p.color;
+      this.ctx.globalAlpha = p.life;
+      this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+      this.ctx.restore();
+    }
+
+    if (this.particles.length > 0) {
+      this.animationId = requestAnimationFrame(() => this.animate());
+    } else {
+      this.animationId = null;
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+  }
+}
+
+let confetti = null;
+
+// --- 3. 애플리케이션 상태 관리 ---
+const state = {
+  stars: 0,
+  stamps: [],
+  rewardCoupon: '맛있는 아이스크림 먹기 🍦',
+  selectedDans: [2, 3, 4, 5, 6, 7, 8, 9],
+  wrongProblems: [],
+  currentGame: {
+    mode: 'speed', // 'speed', 'reverse', 'missing', 'order', 'review'
+    questions: [],
+    currentIndex: 0,
+    currentInput: '',
+    correctCount: 0,
+    combo: 0,
+    maxCombo: 0,
+    currentWrongInRound: [],
+    timerInterval: null,
+    timeLeftPercent: 100,
+    questionStartTime: 0
+  },
+  rhythmTrainer: {
+    dan: 2,
+    direction: 'forward', // 'forward' | 'reverse'
+    isPlaying: false,
+    currentIndex: 0,
+    orderList: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    stepTimer: null,
+    revealTimer: null
+  }
+};
+
+// 레벨 정의
+const LEVELS = [
+  { stars: 0, title: '구구단 새싹 🌱', avatar: '🐥' },
+  { stars: 20, title: '구구단 탐험가 🎒', avatar: '🐰' },
+  { stars: 50, title: '구구단 닌자 ⚔️', avatar: '🦊' },
+  { stars: 100, title: '구구단 마법사 🧙‍♂️', avatar: '🦁' },
+  { stars: 200, title: '구구단 드래곤 마스터 👑', avatar: '🐲' }
+];
+
+// --- 4. 초기화 및 저장소 로드 ---
+document.addEventListener('DOMContentLoaded', () => {
+  confetti = new ConfettiEffect('confetti-canvas');
+  loadSavedData();
+  setupDanChips();
+  setupKeyboardListener();
+
+  const soundBtn = document.getElementById('btn-sound-toggle');
+  if (soundBtn) {
+    soundBtn.addEventListener('click', () => sounds.toggle());
+  }
+});
+
+function loadSavedData() {
+  const savedStars = localStorage.getItem('gugudan_total_stars');
+  if (savedStars) state.stars = parseInt(savedStars, 10) || 0;
+
+  const savedStamps = localStorage.getItem('gugudan_stamps');
+  if (savedStamps) {
+    try {
+      state.stamps = JSON.parse(savedStamps) || [];
+    } catch (e) {
+      state.stamps = [];
+    }
+  }
+
+  const savedCoupon = localStorage.getItem('gugudan_reward_coupon');
+  if (savedCoupon) state.rewardCoupon = savedCoupon;
+
+  // 다시풀기(오답 노트) 리셋 반영: 기존에 쌓인 테스트 오답 자동 초기화
+  if (!localStorage.getItem('gugudan_wrong_reset_v1')) {
+    localStorage.removeItem('gugudan_wrong_problems');
+    localStorage.setItem('gugudan_wrong_reset_v1', 'true');
+    state.wrongProblems = [];
+  } else {
+    const savedWrongs = localStorage.getItem('gugudan_wrong_problems');
+    if (savedWrongs) {
+      try {
+        state.wrongProblems = JSON.parse(savedWrongs) || [];
+      } catch (e) {
+        state.wrongProblems = [];
+      }
+    }
+  }
+
+  updateUserBadge();
+  updateHeaderStampCount();
+  updateWrongReviewBtn();
+}
+
+function saveUserData() {
+  localStorage.setItem('gugudan_total_stars', state.stars);
+  localStorage.setItem('gugudan_stamps', JSON.stringify(state.stamps));
+  localStorage.setItem('gugudan_reward_coupon', state.rewardCoupon);
+  localStorage.setItem('gugudan_wrong_problems', JSON.stringify(state.wrongProblems));
+}
+
+function updateUserBadge() {
+  let currentLevel = LEVELS[0];
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (state.stars >= LEVELS[i].stars) {
+      currentLevel = LEVELS[i];
+      break;
+    }
+  }
+
+  const avatar = document.getElementById('user-avatar');
+  const title = document.getElementById('user-title');
+  const stars = document.getElementById('total-stars');
+  if (avatar) avatar.textContent = currentLevel.avatar;
+  if (title) title.textContent = currentLevel.title;
+  if (stars) stars.textContent = state.stars;
+}
+
+function updateHeaderStampCount() {
+  const countSpan = document.getElementById('header-stamp-count');
+  if (countSpan) {
+    const cur = state.stamps.length % 20;
+    countSpan.textContent = `(${cur}/20)`;
+  }
+}
+
+function updateWrongReviewBtn() {
+  const wrap = document.getElementById('wrong-review-wrap') || document.getElementById('btn-wrong-review');
+  const countSpan = document.getElementById('wrong-count');
+  if (!wrap || !countSpan) return;
+
+  if (state.wrongProblems && state.wrongProblems.length > 0) {
+    wrap.style.display = 'flex';
+    countSpan.textContent = state.wrongProblems.length;
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+function resetWrongProblems(event, skipConfirm = false) {
+  if (event) event.stopPropagation();
+  if (skipConfirm || confirm('틀린 문제 다시 풀기 목록을 모두 리셋할까요?')) {
+    state.wrongProblems = [];
+    localStorage.removeItem('gugudan_wrong_problems');
+    updateWrongReviewBtn();
+  }
+}
+
+// --- 5. 단 선택 칩 핸들러 ---
+function setupDanChips() {
+  const container = document.getElementById('dan-chips');
+  if (!container) return;
+  const chips = container.querySelectorAll('.dan-chip');
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      sounds.playBeep(480, 0.05);
+      const danVal = chip.getAttribute('data-dan');
+
+      if (danVal === 'all') {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        state.selectedDans = [2, 3, 4, 5, 6, 7, 8, 9];
+      } else {
+        const allChip = container.querySelector('[data-dan="all"]');
+        if (allChip) allChip.classList.remove('active');
+
+        chip.classList.toggle('active');
+
+        const activeChips = Array.from(chips).filter(c => c.classList.contains('active') && c.getAttribute('data-dan') !== 'all');
+        if (activeChips.length === 0) {
+          if (allChip) allChip.classList.add('active');
+          state.selectedDans = [2, 3, 4, 5, 6, 7, 8, 9];
+        } else {
+          state.selectedDans = activeChips.map(c => parseInt(c.getAttribute('data-dan'), 10));
+        }
+      }
+    });
+  });
+}
+
+// --- 6. 문제 생성 엔진 (모드별 완벽 분리 & 검증) ---
+function generateQuestions(mode) {
+  const questions = [];
+  const dans = state.selectedDans.length > 0 ? state.selectedDans : [2, 3, 4, 5, 6, 7, 8, 9];
+
+  if (mode === 'speed') {
+    // 1. 순간 반응 팡팡: 선택된 단에서 랜덤 10문제 (정답: 곱셈 결과)
+    for (let i = 0; i < 10; i++) {
+      const num1 = dans[Math.floor(Math.random() * dans.length)];
+      const num2 = Math.floor(Math.random() * 9) + 1;
+      questions.push({
+        num1,
+        num2,
+        expected: num1 * num2,
+        blankType: 'ans'
+      });
+    }
+  } else if (mode === 'reverse') {
+    // 2. 거꾸로 도전: 9부터 1까지 거꾸로 내려가는 문제! (절대 셔플 금지!)
+    // 선택된 단 중 1개 단을 선택하여 9➔1 순서로 9문제 출제
+    const targetDan = dans[Math.floor(Math.random() * dans.length)];
+    for (let num2 = 9; num2 >= 1; num2--) {
+      questions.push({
+        num1: targetDan,
+        num2: num2,
+        expected: targetDan * num2,
+        blankType: 'ans'
+      });
+    }
+  } else if (mode === 'missing') {
+    // 3. 구구단 탐정 (빈칸 채우기): 7 × ? = 56 또는 ? × 8 = 56
+    // 정답은 빈칸에 들어가는 한 자리 수(1~9)입니다!
+    for (let i = 0; i < 10; i++) {
+      const num1 = dans[Math.floor(Math.random() * dans.length)];
+      const num2 = Math.floor(Math.random() * 9) + 1;
+      const blankPosition = Math.random() > 0.5 ? 'num2' : 'num1';
+      questions.push({
+        num1,
+        num2,
+        expected: blankPosition === 'num2' ? num2 : num1,
+        blankType: blankPosition
+      });
+    }
+  } else if (mode === 'order') {
+    // 4. 차근차근 순서대로: 1부터 9까지 순서대로 9문제!
+    const targetDan = dans[Math.floor(Math.random() * dans.length)];
+    for (let num2 = 1; num2 <= 9; num2++) {
+      questions.push({
+        num1: targetDan,
+        num2: num2,
+        expected: targetDan * num2,
+        blankType: 'ans'
+      });
+    }
+  } else if (mode === 'review') {
+    // 5. 오답 다시 풀기
+    const list = [...state.wrongProblems].sort(() => Math.random() - 0.5);
+    const limit = Math.min(list.length, 10);
+    for (let i = 0; i < limit; i++) {
+      const item = list[i];
+      questions.push({
+        num1: item.num1,
+        num2: item.num2,
+        expected: item.num1 * item.num2,
+        blankType: 'ans'
+      });
+    }
+  }
+
+  return questions;
+}
+
+// --- 7. 게임 시작 및 진행 ---
+function startGame(mode) {
+  if (mode === 'review' && state.wrongProblems.length === 0) {
+    alert('오답 노트가 비어있어요! 참 잘했어요 👏');
+    return;
+  }
+
+  sounds.playBeep(600, 0.08);
+
+  const questions = generateQuestions(mode);
+  if (!questions || questions.length === 0) return;
+
+  state.currentGame = {
+    mode,
+    questions,
+    currentIndex: 0,
+    currentInput: '',
+    correctCount: 0,
+    combo: 0,
+    maxCombo: 0,
+    currentWrongInRound: [],
+    timerInterval: null,
+    timeLeftPercent: 100,
+    questionStartTime: 0,
+    isStarted: false // 시작 버튼 누르기 전까지 대기!
+  };
+
+  switchScreen('screen-game');
+  updateIngameDanTabs();
+
+  // 첫 번째 문제 화면을 또렷하게 렌더링해두고 (타이머는 아직 돌지 않음)
+  loadQuestion(false);
+
+  // 중앙에 또렷한 시작 버튼 표시 (흐림 블러 없음!)
+  const overlay = document.getElementById('game-start-overlay');
+  if (overlay) overlay.style.display = 'flex';
+}
+
+function startCurrentGamePlay() {
+  const overlay = document.getElementById('game-start-overlay');
+  if (overlay) overlay.style.display = 'none';
+
+  sounds.playFanfare();
+  state.currentGame.isStarted = true;
+  state.currentGame.questionStartTime = Date.now();
+  startTimerGauge();
+}
+
+// 퀴즈 화면 안에서 실시간으로 단을 변경하는 함수
+function changeGameDan(dan) {
+  sounds.playBeep(520, 0.05);
+
+  if (dan === 'all') {
+    state.selectedDans = [2, 3, 4, 5, 6, 7, 8, 9];
+  } else {
+    state.selectedDans = [parseInt(dan, 10)];
+  }
+
+  // 메인 화면 칩과 동기화
+  const mainChips = document.querySelectorAll('#dan-chips .dan-chip');
+  mainChips.forEach(chip => {
+    const val = chip.getAttribute('data-dan');
+    if (dan === 'all') {
+      if (val === 'all') chip.classList.add('active');
+      else chip.classList.remove('active');
+    } else {
+      if (val === dan.toString()) chip.classList.add('active');
+      else chip.classList.remove('active');
+    }
+  });
+
+  updateIngameDanTabs();
+
+  // 기존 타이머 정지 후 대기 상태로 재시작!
+  if (state.currentGame.timerInterval) clearInterval(state.currentGame.timerInterval);
+  startGame(state.currentGame.mode);
+}
+
+function updateIngameDanTabs() {
+  const tabs = document.querySelectorAll('.ingame-dan-btn');
+  const isAll = state.selectedDans.length >= 8;
+  const singleDan = state.selectedDans.length === 1 ? state.selectedDans[0] : null;
+
+  tabs.forEach(btn => {
+    const dataDan = btn.getAttribute('data-dan');
+    if (dataDan === 'all') {
+      if (isAll) btn.classList.add('active');
+      else btn.classList.remove('active');
+    } else {
+      const danNum = parseInt(dataDan, 10);
+      if (!isAll && singleDan === danNum) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    }
+  });
+}
+
+function loadQuestion(startTimer = true) {
+  const g = state.currentGame;
+  if (g.currentIndex >= g.questions.length) {
+    finishGame();
+    return;
+  }
+
+  g.currentInput = '';
+  const feedbackMsg = document.getElementById('feedback-msg');
+  if (feedbackMsg) {
+    feedbackMsg.textContent = '';
+    feedbackMsg.className = 'feedback-msg';
+  }
+
+  const hintCard = document.getElementById('hint-smart-card');
+  if (hintCard) hintCard.style.display = 'none';
+
+  const q = g.questions[g.currentIndex];
+
+  // 진행률 표시
+  const progressPercent = (g.currentIndex / g.questions.length) * 100;
+  const pBar = document.getElementById('game-progress-bar');
+  if (pBar) pBar.style.width = `${progressPercent}%`;
+
+  const qCounter = document.getElementById('question-counter');
+  if (qCounter) qCounter.textContent = `${g.currentIndex + 1} / ${g.questions.length}`;
+
+  // 모드별 명확한 제목 라벨
+  const modeLabels = {
+    speed: '⚡ 순간 반응 팡팡 (랜덤 10문제)',
+    reverse: `🔄 거꾸로 도전 (${q.num1}단: 9 ➔ 1)`,
+    missing: '🕵️ 구구단 탐정 (빈칸 ❓을 찾아라!)',
+    order: `🌱 차근차근 순서대로 (${q.num1}단: 1 ➔ 9)`,
+    review: '🩹 오답 다시 풀기'
+  };
+  const modeInd = document.getElementById('game-mode-indicator');
+  if (modeInd) modeInd.textContent = modeLabels[g.mode] || '구구단 퀴즈';
+
+  // 수식 렌더링
+  renderExpression(q);
+
+  // 똑똑한 힌트 세팅
+  setupSmartHints(q);
+
+  if (startTimer && g.isStarted) {
+    g.questionStartTime = Date.now();
+    startTimerGauge();
+  }
+}
+
+function renderExpression(q) {
+  const box = document.getElementById('expression-box');
+  if (!box) return;
+  const product = q.num1 * q.num2;
+
+  if (q.blankType === 'ans') {
+    // 7 × 8 = [ ? ]
+    box.innerHTML = `
+      <span class="num-a">${q.num1}</span>
+      <span class="op">×</span>
+      <span class="num-b">${q.num2}</span>
+      <span class="eq">=</span>
+      <span class="answer-slot" id="disp-answer">?</span>
+    `;
+  } else if (q.blankType === 'num2') {
+    // 7 × [ ? ] = 56
+    box.innerHTML = `
+      <span class="num-a">${q.num1}</span>
+      <span class="op">×</span>
+      <span class="answer-slot missing-slot" id="disp-answer">?</span>
+      <span class="eq">=</span>
+      <span class="num-b">${product}</span>
+    `;
+  } else if (q.blankType === 'num1') {
+    // [ ? ] × 8 = 56
+    box.innerHTML = `
+      <span class="answer-slot missing-slot" id="disp-answer">?</span>
+      <span class="op">×</span>
+      <span class="num-b">${q.num2}</span>
+      <span class="eq">=</span>
+      <span class="num-b">${product}</span>
+    `;
+  }
+}
+
+function setupSmartHints(q) {
+  const reverseText = document.getElementById('hint-reverse-text');
+  if (reverseText) {
+    reverseText.innerHTML = `앞뒤를 바꿔도 같아요! <strong>${q.num2} × ${q.num1} = ${q.num1 * q.num2}</strong>`;
+  }
+
+  const bridgeText = document.getElementById('hint-bridge-text');
+  if (bridgeText) {
+    if (q.num2 > 1) {
+      const prevN2 = q.num2 - 1;
+      const prevProd = q.num1 * prevN2;
+      bridgeText.innerHTML = `${q.num1} × ${prevN2} = ${prevProd}에 <strong>${q.num1}을 한 번 더하면</strong> ${q.num1 * q.num2}!`;
+    } else {
+      bridgeText.innerHTML = `${q.num1}이 딱 1번 있으니까 바로 <strong>${q.num1}</strong>!`;
+    }
+  }
+
+  const visual = document.getElementById('hint-visual');
+  if (visual) {
+    let html = `<div style="font-size:12px; font-weight:bold; color:#5E35B1; margin-bottom:4px;">
+      ${q.num1}개씩 ${q.num2}줄 = 총 ${q.num1 * q.num2}개
+    </div>`;
+
+    for (let r = 0; r < q.num2; r++) {
+      html += `<div class="hint-group-row">`;
+      html += `<span class="hint-group-label">${r + 1}줄</span>`;
+      for (let c = 0; c < q.num1; c++) {
+        html += `<span class="hint-dot"></span>`;
+      }
+      html += `</div>`;
+    }
+    visual.innerHTML = html;
+  }
+}
+
+function toggleHint() {
+  const card = document.getElementById('hint-smart-card');
+  if (!card) return;
+  const isHidden = card.style.display === 'none';
+  card.style.display = isHidden ? 'flex' : 'none';
+  if (isHidden) sounds.playBeep(650, 0.05);
+}
+
+function startTimerGauge() {
+  const gauge = document.getElementById('timer-gauge');
+  if (!gauge) return;
+  if (state.currentGame.timerInterval) {
+    clearInterval(state.currentGame.timerInterval);
+  }
+
+  let timeLeft = 100;
+  state.currentGame.timeLeftPercent = 100;
+  gauge.style.width = '100%';
+  gauge.style.backgroundColor = '#4CAF50';
+
+  state.currentGame.timerInterval = setInterval(() => {
+    timeLeft -= 1.15;
+    if (timeLeft <= 0) {
+      timeLeft = 0;
+      clearInterval(state.currentGame.timerInterval);
+      const feedback = document.getElementById('feedback-msg');
+      if (feedback && feedback.textContent === '') {
+        feedback.textContent = '천천히 생각해보세요 💭 답을 찾을 수 있어요!';
+        feedback.className = 'feedback-msg';
+      }
+    }
+    state.currentGame.timeLeftPercent = timeLeft;
+    gauge.style.width = `${timeLeft}%`;
+    if (timeLeft < 30) {
+      gauge.style.backgroundColor = '#FF5252';
+    } else if (timeLeft < 60) {
+      gauge.style.backgroundColor = '#FFA726';
+    }
+  }, 100);
+}
+
+// --- 8. 키 입력 및 스마트 자동 제출 ---
+function pressKey(key) {
+  if (!state.currentGame.isStarted) return; // 시작 버튼 누르기 전에는 입력 방지!
+
+  sounds.playBeep(580, 0.04);
+  const g = state.currentGame;
+  const disp = document.getElementById('disp-answer');
+  if (!disp) return;
+
+  if (key === 'clear') {
+    g.currentInput = '';
+    disp.textContent = '?';
+    disp.classList.remove('filled');
+    return;
+  }
+
+  if (g.currentInput.length >= 2) return;
+
+  g.currentInput += key.toString();
+  disp.textContent = g.currentInput;
+  disp.classList.add('filled');
+
+  const q = g.questions[g.currentIndex];
+  // expected의 실제 자릿수 계산 (1자리인지 2자리인지)
+  const targetLength = q.expected < 10 ? 1 : 2;
+
+  // 자릿수가 다 채워지면 120ms 후 자동 제출!
+  if (g.currentInput.length >= targetLength) {
+    setTimeout(() => {
+      if (g.currentInput.length >= targetLength) {
+        submitAnswer();
+      }
+    }, 120);
+  }
+}
+
+function submitAnswer() {
+  const g = state.currentGame;
+  if (!g.currentInput) return;
+
+  if (g.timerInterval) clearInterval(g.timerInterval);
+
+  const userAnswer = parseInt(g.currentInput, 10);
+  const q = g.questions[g.currentIndex];
+  const isCorrect = userAnswer === q.expected;
+
+  const card = document.getElementById('quiz-card');
+  const feedback = document.getElementById('feedback-msg');
+  const elapsedSec = (Date.now() - g.questionStartTime) / 1000;
+
+  if (isCorrect) {
+    sounds.playCorrect();
+    g.correctCount++;
+    g.combo++;
+    if (g.combo > g.maxCombo) g.maxCombo = g.combo;
+
+    state.stars += (g.combo >= 3 ? 2 : 1);
+    saveUserData();
+    updateUserBadge();
+
+    showComboBanner(g.combo);
+
+    if (feedback) {
+      if (elapsedSec <= 3.5) {
+        feedback.textContent = `⚡ 번개 스피드! (${elapsedSec.toFixed(1)}초) 대단해요!`;
+      } else {
+        feedback.textContent = getEncouragementText(g.combo);
+      }
+      feedback.className = 'feedback-msg correct';
+    }
+
+    confetti.burst(window.innerWidth / 2, window.innerHeight * 0.4, 20);
+
+    removeProblemFromWrongList(q.num1, q.num2);
+
+    setTimeout(() => {
+      g.currentIndex++;
+      loadQuestion();
+    }, 650);
+
+  } else {
+    sounds.playWrong();
+    g.combo = 0;
+    hideComboBanner();
+
+    if (card) {
+      card.classList.add('shake');
+      setTimeout(() => card.classList.remove('shake'), 400);
+    }
+
+    if (feedback) {
+      if (q.blankType === 'ans') {
+        feedback.textContent = `아쉬워요! 정답은 [ ${q.expected} ] 이에요 💡`;
+      } else if (q.blankType === 'num2') {
+        feedback.textContent = `아쉬워요! 빈칸은 [ ${q.num2} ] 이에요 (${q.num1} × ${q.num2} = ${q.num1 * q.num2}) 💡`;
+      } else {
+        feedback.textContent = `아쉬워요! 빈칸은 [ ${q.num1} ] 이에요 (${q.num1} × ${q.num2} = ${q.num1 * q.num2}) 💡`;
+      }
+      feedback.className = 'feedback-msg wrong';
+    }
+
+    addProblemToWrongList(q.num1, q.num2);
+    g.currentWrongInRound.push({ num1: q.num1, num2: q.num2, expected: q.expected });
+
+    setTimeout(() => {
+      g.currentIndex++;
+      loadQuestion();
+    }, 1600);
+  }
+}
+
+function showComboBanner(combo) {
+  const banner = document.getElementById('combo-banner');
+  if (!banner) return;
+  if (combo >= 2) {
+    banner.innerHTML = `연속 정답! 🔥 x<span>${combo}</span>`;
+    banner.classList.add('show');
+  }
+}
+
+function hideComboBanner() {
+  const banner = document.getElementById('combo-banner');
+  if (banner) banner.classList.remove('show');
+}
+
+function getEncouragementText(combo) {
+  const phrases = [
+    '정답이에요! 참 잘했어요 👏',
+    '와! 정말 멋져요! 🌟',
+    '구구단 박사님 실력인데요?! 🚀',
+    '완벽해요! 멋져요! 💖'
+  ];
+  if (combo >= 5) return '🔥 불꽃 콤보! 머릿속에서 답이 바로 튀어나와요!';
+  if (combo >= 3) return '🌟 3연속 정답! 감을 제대로 잡았어요!';
+  return phrases[Math.floor(Math.random() * phrases.length)];
+}
+
+function addProblemToWrongList(num1, num2) {
+  const exists = state.wrongProblems.some(p => p.num1 === num1 && p.num2 === num2);
+  if (!exists) {
+    state.wrongProblems.push({ num1, num2 });
+    saveUserData();
+    updateWrongReviewBtn();
+  }
+}
+
+function removeProblemFromWrongList(num1, num2) {
+  state.wrongProblems = state.wrongProblems.filter(p => !(p.num1 === num1 && p.num2 === num2));
+  saveUserData();
+  updateWrongReviewBtn();
+}
+
+// --- 9. PC 키보드 지원 ---
+function setupKeyboardListener() {
+  window.addEventListener('keydown', (e) => {
+    const activeScreen = document.querySelector('.screen.active');
+    if (!activeScreen || activeScreen.id !== 'screen-game') return;
+
+    if (e.key >= '0' && e.key <= '9') {
+      pressKey(parseInt(e.key, 10));
+    } else if (e.key === 'Backspace' || e.key === 'Delete') {
+      pressKey('clear');
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      submitAnswer();
+    }
+  });
+}
+
+// --- 10. 결과 화면 & 스탬프 쾅! 애니메이션 ---
+function finishGame() {
+  const g = state.currentGame;
+  if (g.timerInterval) clearInterval(g.timerInterval);
+
+  switchScreen('screen-result');
+
+  document.getElementById('res-correct').textContent = g.correctCount;
+  document.getElementById('res-total').textContent = g.questions.length;
+  document.getElementById('res-stars').textContent = g.correctCount + (g.maxCombo >= 3 ? 2 : 0);
+  document.getElementById('res-max-combo').textContent = g.maxCombo;
+
+  const titleEl = document.getElementById('result-title');
+  const subEl = document.getElementById('result-subtitle');
+  const avatarEl = document.getElementById('result-avatar');
+
+  const accuracy = g.correctCount / g.questions.length;
+  let stampType = 'normal';
+  let stampTitle = '참 잘했어요';
+  let stampSub = `${g.correctCount}/${g.questions.length}`;
+
+  if (accuracy === 1) {
+    if (avatarEl) avatarEl.textContent = '👑';
+    if (titleEl) titleEl.textContent = '100점 만점! 완벽해요!';
+    if (subEl) subEl.textContent = '거침없이 팡팡 맞혔어요! 구구단 마스터!';
+    stampType = 'gold';
+    stampTitle = '참 잘했어요';
+    stampSub = '100점 만점 💮';
+  } else if (accuracy >= 0.7) {
+    if (avatarEl) avatarEl.textContent = '🎉';
+    if (titleEl) titleEl.textContent = '정말 잘했어요!';
+    if (subEl) subEl.textContent = '실력이 쑥쑥 늘고 있어요! 조금만 더 하면 만점!';
+    stampType = 'normal';
+    stampTitle = '아주 훌륭해요';
+    stampSub = '우수 훈련 👍';
+  } else {
+    if (avatarEl) avatarEl.textContent = '🌱';
+    if (titleEl) titleEl.textContent = '좋은 도전이었어요!';
+    if (subEl) subEl.textContent = '꾸준히 하면 머릿속에서 답이 바로 튀어나올 거예요!';
+    stampType = 'normal';
+    stampTitle = '멋진 도전';
+    stampSub = '열정 칭찬 💪';
+  }
+
+  applyStampToResult(stampType, stampTitle, stampSub);
+
+  const wrongWrap = document.getElementById('result-wrong-list');
+  const chipsContainer = document.getElementById('wrong-chips-container');
+  if (wrongWrap && chipsContainer) {
+    if (g.currentWrongInRound.length > 0) {
+      wrongWrap.style.display = 'block';
+      chipsContainer.innerHTML = g.currentWrongInRound.map(w =>
+        `<span class="wrong-chip">${w.num1} × ${w.num2} = ${w.expected}</span>`
+      ).join('');
+    } else {
+      wrongWrap.style.display = 'none';
+    }
+  }
+}
+
+function applyStampToResult(stampType, stampTitle, stampSub) {
+  const stampEl = document.getElementById('result-stamp');
+  const stampMain = document.getElementById('stamp-main-text');
+  const stampDate = document.getElementById('stamp-date-text');
+
+  if (stampEl) stampEl.className = 'stamp-seal' + (stampType === 'gold' ? ' gold' : '');
+  if (stampMain) stampMain.textContent = stampTitle;
+  if (stampDate) stampDate.textContent = stampSub;
+
+  setTimeout(() => {
+    if (stampEl) stampEl.classList.add('stamped');
+    sounds.playStamp();
+    sounds.playFanfare();
+    confetti.burst(window.innerWidth / 2, window.innerHeight * 0.4, 65);
+  }, 300);
+
+  state.stamps.push({
+    type: stampType,
+    title: stampTitle,
+    date: new Date().toLocaleDateString('ko-KR')
+  });
+  saveUserData();
+  updateHeaderStampCount();
+}
+
+// --- 11. 칭찬 스탬프판 모달 시스템 ---
+function openStampModal() {
+  sounds.playBeep(620, 0.05);
+  renderStampBoard();
+  const modal = document.getElementById('stamp-modal');
+  if (modal) modal.classList.add('open');
+}
+
+function closeStampModal(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close-btn')) return;
+  sounds.playBeep(450, 0.05);
+  const modal = document.getElementById('stamp-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+function renderStampBoard() {
+  const grid = document.getElementById('stamp-board-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  const totalSlots = 20;
+  const currentStamps = state.stamps;
+  const filledInCurrentPage = currentStamps.length % totalSlots;
+  const isPageFull = (currentStamps.length > 0 && filledInCurrentPage === 0);
+  const activeCount = isPageFull ? totalSlots : filledInCurrentPage;
+
+  for (let i = 1; i <= totalSlots; i++) {
+    const isStamped = i <= activeCount;
+    const isMilestone = (i === 10 || i === 20);
+
+    const slot = document.createElement('div');
+    let classNames = 'stamp-slot';
+    if (isMilestone) classNames += ' milestone';
+    if (isStamped) classNames += ' stamped';
+
+    let mark = `<span class="stamp-slot-num">${i}</span>`;
+    if (isStamped) {
+      mark += `<span class="stamp-slot-mark">${i === 20 ? '🎁' : (i === 10 ? '👑' : '💮')}</span>`;
+    } else if (isMilestone) {
+      mark += `<span style="font-size:16px;">${i === 20 ? '🎁' : '⭐'}</span>`;
+    }
+
+    slot.className = classNames;
+    slot.innerHTML = mark;
+    grid.appendChild(slot);
+  }
+
+  const claimBtn = document.getElementById('btn-claim-reward');
+  const rewardMsg = document.getElementById('stamp-reward-msg');
+
+  if (activeCount === 20) {
+    if (claimBtn) claimBtn.style.display = 'block';
+    if (rewardMsg) rewardMsg.textContent = '🎉 와아! 도장 20개를 모두 채웠어요! 부모님 선물을 열어보세요!';
+  } else {
+    if (claimBtn) claimBtn.style.display = 'none';
+    if (rewardMsg) rewardMsg.textContent = `⭐ 도장 20개를 모으면 부모님 쿠폰이 열려요! (현재 ${activeCount} / 20)`;
+  }
+}
+
+// --- 12. 부모님 보상 쿠폰함 모달 & 티켓 개봉 ---
+function openCouponModal() {
+  sounds.playBeep(620, 0.05);
+  const modal = document.getElementById('coupon-modal');
+  if (modal) modal.classList.add('open');
+}
+
+function closeCouponModal(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close-btn')) return;
+  sounds.playBeep(450, 0.05);
+  const modal = document.getElementById('coupon-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+function saveCouponSetting() {
+  const checked = document.querySelector('input[name="coupon-choice"]:checked');
+  if (!checked) return;
+
+  if (checked.value === 'custom') {
+    const customText = document.getElementById('coupon-custom-text').value.trim();
+    if (!customText) {
+      alert('직접 줄 선물의 내용을 적어주세요! (예: 동물원 가기)');
+      return;
+    }
+    state.rewardCoupon = `🎁 ${customText}`;
+  } else {
+    state.rewardCoupon = checked.value;
+  }
+
+  saveUserData();
+  sounds.playCorrect();
+  alert(`보상 쿠폰이 [ ${state.rewardCoupon} ] (으)로 저장되었습니다!`);
+  const modal = document.getElementById('coupon-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+function claimRewardCoupon() {
+  closeStampModal();
+  sounds.playFanfare();
+  confetti.burst(window.innerWidth / 2, window.innerHeight * 0.4, 80);
+
+  const ticketContent = document.getElementById('ticket-content-text');
+  if (ticketContent) ticketContent.textContent = state.rewardCoupon;
+
+  const rewardModal = document.getElementById('reward-open-modal');
+  if (rewardModal) rewardModal.classList.add('open');
+}
+
+function closeRewardModal(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('action-btn')) return;
+  const rewardModal = document.getElementById('reward-open-modal');
+  if (rewardModal) rewardModal.classList.remove('open');
+}
+
+function restartCurrentGame() {
+  startGame(state.currentGame.mode);
+}
+
+function goHome() {
+  sounds.playBeep(480, 0.05);
+  stopRhythmTimer();
+  switchScreen('screen-home');
+  updateUserBadge();
+  updateHeaderStampCount();
+  updateWrongReviewBtn();
+}
+
+function confirmExitGame() {
+  if (confirm('게임을 그만두고 처음 화면으로 돌아갈까요?')) {
+    if (state.currentGame.timerInterval) clearInterval(state.currentGame.timerInterval);
+    goHome();
+  }
+}
+
+function switchScreen(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(screenId);
+  if (target) target.classList.add('active');
+}
+
+// ========================================================
+// --- 13. 구구단 외우기 (리듬 훈련 룸) ---
+// ========================================================
+
+function openRhythmScreen(dan = 2) {
+  sounds.playBeep(650, 0.08);
+  state.rhythmTrainer.dan = dan;
+  state.rhythmTrainer.currentIndex = 0;
+  state.rhythmTrainer.isPlaying = false;
+
+  switchScreen('screen-rhythm');
+  updateRhythmDanTabs();
+  updateRhythmDirectionButtons();
+  setupRhythmOrderList();
+  renderRhythmBoard();
+
+  showRhythmReadyState();
+}
+
+function showRhythmReadyState() {
+  stopRhythmTimer();
+  state.rhythmTrainer.isPlaying = false;
+  state.rhythmTrainer.currentIndex = 0;
+
+  const playBtn = document.getElementById('btn-rhythm-play');
+  if (playBtn) {
+    playBtn.textContent = '▶ 시작하기';
+    playBtn.className = 'ctrl-btn btn-play-pause btn-rhythm-main-act';
+    playBtn.onclick = handleRhythmStartOrToggle;
+  }
+
+  const banner = document.getElementById('rhythm-status-msg');
+  if (banner) {
+    banner.innerHTML = `준비가 되면 <strong>[ ▶ 구구단 시작하기! ]</strong> 버튼을 눌러주세요!`;
+  }
+
+  const counter = document.getElementById('rhythm-step-counter');
+  if (counter) counter.textContent = '0 / 9';
+
+  const overlay = document.getElementById('rhythm-start-overlay');
+  if (overlay) overlay.style.display = 'flex';
+}
+
+function handleRhythmStartOrToggle() {
+  const rt = state.rhythmTrainer;
+  const overlay = document.getElementById('rhythm-start-overlay');
+
+  if (!rt.isPlaying && rt.currentIndex === 0) {
+    if (overlay) overlay.style.display = 'none';
+    rt.isPlaying = true;
+
+    sounds.playFanfare();
+
+    const playBtn = document.getElementById('btn-rhythm-play');
+    if (playBtn) {
+      playBtn.textContent = '⏸ 일시정지';
+      playBtn.className = 'ctrl-btn btn-play-pause';
+    }
+
+    const banner = document.getElementById('rhythm-status-msg');
+    if (banner) {
+      banner.innerHTML = `⚡ 굵고 크게 커지는 식을 보고, <strong>3초 안에 답을 먼저 말해보세요!</strong>`;
+    }
+
+    startRhythmStep();
+  } else {
+    toggleRhythmPlay();
+  }
+}
+
+function exitRhythmToHome() {
+  stopRhythmTimer();
+  goHome();
+}
+
+function selectRhythmDan(dan) {
+  sounds.playBeep(520, 0.04);
+  state.rhythmTrainer.dan = dan;
+  updateRhythmDanTabs();
+  setupRhythmOrderList();
+  renderRhythmBoard();
+  showRhythmReadyState();
+}
+
+function setRhythmDirection(dir) {
+  sounds.playBeep(520, 0.04);
+  state.rhythmTrainer.direction = dir;
+  updateRhythmDirectionButtons();
+  setupRhythmOrderList();
+  renderRhythmBoard();
+  showRhythmReadyState();
+}
+
+function updateRhythmDanTabs() {
+  const tabs = document.querySelectorAll('.r-dan-btn');
+  tabs.forEach((btn, idx) => {
+    const danVal = idx + 2;
+    if (danVal === state.rhythmTrainer.dan) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+}
+
+function updateRhythmDirectionButtons() {
+  const btnFwd = document.getElementById('btn-dir-forward');
+  const btnRev = document.getElementById('btn-dir-reverse');
+  if (btnFwd && btnRev) {
+    if (state.rhythmTrainer.direction === 'forward') {
+      btnFwd.classList.add('active');
+      btnRev.classList.remove('active');
+    } else {
+      btnFwd.classList.remove('active');
+      btnRev.classList.add('active');
+    }
+  }
+}
+
+function setupRhythmOrderList() {
+  if (state.rhythmTrainer.direction === 'forward') {
+    state.rhythmTrainer.orderList = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  } else {
+    state.rhythmTrainer.orderList = [9, 8, 7, 6, 5, 4, 3, 2, 1];
+  }
+}
+
+function renderRhythmBoard() {
+  const board = document.getElementById('rhythm-board');
+  if (!board) return;
+  board.innerHTML = '';
+
+  const rt = state.rhythmTrainer;
+  const dan = rt.dan;
+
+  rt.orderList.forEach((num2, index) => {
+    const row = document.createElement('div');
+    row.className = 'rhythm-row';
+    row.id = `r-row-${index}`;
+
+    row.innerHTML = `
+      <div class="rhythm-row-expr">
+        <span>${dan}</span>
+        <span class="op">×</span>
+        <span>${num2}</span>
+        <span>=</span>
+      </div>
+      <div class="rhythm-row-ans" id="r-ans-${index}">?</div>
+    `;
+
+    board.appendChild(row);
+  });
+}
+
+function updateRhythmStepCounter() {
+  const counter = document.getElementById('rhythm-step-counter');
+  if (counter) {
+    const cur = Math.min(state.rhythmTrainer.currentIndex + 1, 9);
+    counter.textContent = `${cur} / 9`;
+  }
+}
+
+function startRhythmStep() {
+  const rt = state.rhythmTrainer;
+  if (!rt.isPlaying) return;
+
+  if (rt.currentIndex >= rt.orderList.length) {
+    finishRhythmDan();
+    return;
+  }
+
+  updateRhythmStepCounter();
+
+  const idx = rt.currentIndex;
+  const num2 = rt.orderList[idx];
+  const dan = rt.dan;
+  const expected = dan * num2;
+
+  const currentRow = document.getElementById(`r-row-${idx}`);
+  if (currentRow) {
+    currentRow.classList.add('active');
+    const ansSlot = document.getElementById(`r-ans-${idx}`);
+    if (ansSlot) ansSlot.innerHTML = `<span class="thinking-dots">?</span>`;
+  }
+
+  sounds.playTone(480, 0.06, 'triangle', 0.08);
+
+  // 3초 대기 후 정답 공개
+  rt.revealTimer = setTimeout(() => {
+    if (!rt.isPlaying) return;
+
+    if (currentRow) {
+      currentRow.classList.add('revealed');
+      const ansSlot = document.getElementById(`r-ans-${idx}`);
+      if (ansSlot) ansSlot.textContent = expected;
+      sounds.playCorrect();
+    }
+
+    // 1.1초 후 다음 줄 이동
+    rt.stepTimer = setTimeout(() => {
+      if (!rt.isPlaying) return;
+
+      if (currentRow) {
+        currentRow.classList.remove('active');
+        currentRow.classList.add('done');
+      }
+
+      rt.currentIndex++;
+      startRhythmStep();
+    }, 1100);
+
+  }, 3000);
+}
+
+function stopRhythmTimer() {
+  const rt = state.rhythmTrainer;
+  if (rt.stepTimer) clearTimeout(rt.stepTimer);
+  if (rt.revealTimer) clearTimeout(rt.revealTimer);
+}
+
+function toggleRhythmPlay() {
+  const rt = state.rhythmTrainer;
+  const btn = document.getElementById('btn-rhythm-play');
+
+  if (rt.isPlaying) {
+    rt.isPlaying = false;
+    stopRhythmTimer();
+    if (btn) {
+      btn.textContent = '▶ 계속 재생';
+      btn.className = 'ctrl-btn btn-play-pause btn-rhythm-main-act';
+    }
+  } else {
+    rt.isPlaying = true;
+    if (btn) {
+      btn.textContent = '⏸ 일시정지';
+      btn.className = 'ctrl-btn btn-play-pause';
+    }
+    startRhythmStep();
+  }
+}
+
+function restartRhythm() {
+  stopRhythmTimer();
+  state.rhythmTrainer.currentIndex = 0;
+  setupRhythmOrderList();
+  renderRhythmBoard();
+  showRhythmReadyState();
+}
+
+function finishRhythmDan() {
+  stopRhythmTimer();
+  state.rhythmTrainer.isPlaying = false;
+
+  const dan = state.rhythmTrainer.dan;
+
+  const lastIdx = state.rhythmTrainer.orderList.length - 1;
+  const lastRow = document.getElementById(`r-row-${lastIdx}`);
+  if (lastRow) {
+    lastRow.classList.remove('active');
+    lastRow.classList.add('done');
+  }
+
+  sounds.playFanfare();
+
+  // 4연속 대형 폭죽 연출
+  confetti.burst(window.innerWidth / 2, window.innerHeight * 0.45, 75);
+  setTimeout(() => confetti.burst(window.innerWidth * 0.25, window.innerHeight * 0.35, 70), 250);
+  setTimeout(() => confetti.burst(window.innerWidth * 0.75, window.innerHeight * 0.35, 70), 500);
+  setTimeout(() => confetti.burst(window.innerWidth / 2, window.innerHeight * 0.25, 95), 800);
+
+  state.stars += 3;
+  saveUserData();
+  updateUserBadge();
+
+  const banner = document.getElementById('rhythm-status-msg');
+  if (banner) {
+    banner.innerHTML = `🎉 <strong>[ ${dan}단 ] 완주 대성공!</strong> 9문제 모두 멋지게 완성했어요! ⭐ +3 획득!`;
+  }
+
+  const counter = document.getElementById('rhythm-step-counter');
+  if (counter) counter.textContent = '9 / 9 (완료)';
+
+  const playBtn = document.getElementById('btn-rhythm-play');
+  if (playBtn) {
+    playBtn.textContent = '🔄 다시 하기';
+    playBtn.className = 'ctrl-btn btn-play-pause btn-rhythm-main-act';
+    playBtn.onclick = restartRhythm;
+  }
+}
+
+</script>
+</body>
+</html>
+
