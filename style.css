@@ -951,6 +951,16 @@ body {
   position: relative;
 }
 
+#screen-rhythm {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.rhythm-top-bar {
+  cursor: default;
+}
+
 .rhythm-start-overlay, .game-start-overlay {
   position: absolute;
   top: 70px;

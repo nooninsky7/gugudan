@@ -243,6 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadSavedData();
   setupDanChips();
   setupKeyboardListener();
+  setupRhythmScreenListener();
 
   const soundBtn = document.getElementById('btn-sound-toggle');
   if (soundBtn) {
@@ -1160,7 +1161,7 @@ function handleRhythmStartOrToggle() {
 
     const banner = document.getElementById('rhythm-status-msg');
     if (banner) {
-      banner.innerHTML = `🗣️ 소리내어 답을 먼저 외친 후, <strong>화면을 터치</strong>하면 정답이 나타나요! 👆`;
+      banner.innerHTML = `🗣️ 소리내어 답을 먼저 외친 후, <strong>화면 아무 곳이나 터치</strong>하면 정답이 나타나요! ✨`;
     }
 
     startRhythmStep();
@@ -1226,6 +1227,20 @@ function setupRhythmOrderList() {
   }
 }
 
+function setupRhythmScreenListener() {
+  const rhythmScreen = document.getElementById('screen-rhythm');
+  if (!rhythmScreen) return;
+
+  // 태블릿/모바일/PC 어디서든 화면 전체 터치 인식
+  rhythmScreen.addEventListener('click', (e) => {
+    // 상단 바의 버튼들(홈, 단 선택, 방향, 일시정지) 및 시작 오버레이 클릭은 제외
+    if (e.target.closest('.rhythm-top-bar') || e.target.closest('.rhythm-start-overlay')) {
+      return;
+    }
+    handleRhythmInteraction();
+  });
+}
+
 function renderRhythmBoard() {
   const board = document.getElementById('rhythm-board');
   if (!board) return;
@@ -1238,10 +1253,6 @@ function renderRhythmBoard() {
     const row = document.createElement('div');
     row.className = 'rhythm-row';
     row.id = `r-row-${index}`;
-    row.onclick = (e) => {
-      e.stopPropagation();
-      handleRhythmInteraction();
-    };
 
     row.innerHTML = `
       <div class="rhythm-row-expr">
@@ -1255,11 +1266,6 @@ function renderRhythmBoard() {
 
     board.appendChild(row);
   });
-
-  // 보드 여백을 터치해도 현재 활성화된 줄이 상호작용하도록 지원
-  board.onclick = () => {
-    handleRhythmInteraction();
-  };
 }
 
 function updateRhythmStepCounter() {
@@ -1393,7 +1399,7 @@ function toggleRhythmPlay() {
     }
     const banner = document.getElementById('rhythm-status-msg');
     if (banner) {
-      banner.innerHTML = `🗣️ 소리내어 답을 먼저 외친 후, <strong>화면을 터치</strong>하면 정답이 나타나요! 👆`;
+      banner.innerHTML = `🗣️ 소리내어 답을 먼저 외친 후, <strong>화면 아무 곳이나 터치</strong>하면 정답이 나타나요! ✨`;
     }
     if (rt.isRevealed) {
       advanceRhythmToNext();
