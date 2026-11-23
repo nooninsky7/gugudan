@@ -1943,6 +1943,119 @@ body {
   opacity: 0.8;
 }
 
+/* ================= 9. 도장 진행 게이지 & 배지 ================= */
+.stamp-progress-pill {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  background: #FFF8E1;
+  border: 1px solid #FFE082;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #F57F17;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  pointer-events: none;
+}
+.stamp-progress-pill.almost {
+  background: #E8F5E9;
+  border-color: #81C784;
+  color: #2E7D32;
+  font-weight: 900;
+}
+.rhythm-stamp-pill {
+  background: #FFF3E0;
+  border: 1px solid #FFCC80;
+  border-radius: 12px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #E65100;
+}
+.rhythm-stamp-pill.almost {
+  background: #E8F5E9;
+  border-color: #81C784;
+  color: #2E7D32;
+  font-weight: 900;
+}
+
+/* 퀴즈 결과 화면의 도장 진행 배너 및 미리보기 도장 */
+.stamp-progress-banner {
+  background: #FFF8E1;
+  border: 2px dashed #FFD54F;
+  border-radius: 16px;
+  padding: 10px 16px;
+  margin: 12px 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #E65100;
+  text-align: center;
+}
+.stamp-progress-banner.earned {
+  background: #E8F5E9;
+  border-color: #66BB6A;
+  color: #2E7D32;
+  animation: pulseReward 1.2s infinite;
+}
+.stamp-seal.preview-mode {
+  transform: rotate(-10deg) scale(0.92);
+  opacity: 0.85;
+  border-style: dotted;
+  border-color: #78909C;
+  color: #546E7A;
+}
+.stamp-seal.preview-mode .stamp-inner {
+  border-color: #90A4AE;
+}
+
+/* 도장판 모달 내 규칙 박스 & 대시보드 */
+.stamp-rules-box {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  background: #FFF8E1;
+  border: 1px solid #FFE082;
+  border-radius: 12px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-size: 0.86rem;
+  color: #B26A00;
+  flex-wrap: wrap;
+}
+.stamp-progress-dashboard {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.stamp-prog-item {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 8px 6px;
+  text-align: center;
+}
+.stamp-prog-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748B;
+  display: block;
+  white-space: nowrap;
+}
+.stamp-prog-val {
+  font-size: 0.92rem;
+  font-weight: 900;
+  color: #FF7043;
+  margin-top: 2px;
+  display: block;
+}
+.stamp-prog-val.done {
+  color: #2E7D32;
+}
+
 @media (max-width: 768px) {
   #app {
     padding: 14px;

@@ -214,6 +214,13 @@ let confetti = null;
 const state = {
   stars: 0,
   stamps: [],
+  stampProgress: {
+    rhythm: 0,
+    speed: 0,
+    reverse: 0,
+    missing: 0,
+    order: 0
+  },
   rewardCoupon: '맛있는 아이스크림 먹기 🍦',
   selectedDans: [2, 3, 4, 5, 6, 7, 8, 9],
   wrongProblems: [],
@@ -332,15 +339,79 @@ function loadSavedData() {
     }
   }
 
+  const savedStampProgress = localStorage.getItem('gugudan_stamp_progress');
+  if (savedStampProgress) {
+    try {
+      state.stampProgress = Object.assign({ rhythm: 0, speed: 0, reverse: 0, missing: 0, order: 0 }, JSON.parse(savedStampProgress));
+    } catch (e) {
+      state.stampProgress = { rhythm: 0, speed: 0, reverse: 0, missing: 0, order: 0 };
+    }
+  } else {
+    state.stampProgress = { rhythm: 0, speed: 0, reverse: 0, missing: 0, order: 0 };
+  }
+
   updateUserBadge();
   updateHeaderStampCount();
   updateWrongReviewBtn();
   updateHomeBestTags();
+  updateStampProgressUI();
+}
+
+function updateStampProgressUI() {
+  const p = state.stampProgress || { rhythm: 0, speed: 0, reverse: 0, missing: 0, order: 0 };
+
+  // 1. 리듬 구구단 (목표 8회 완주)
+  const rhythmEl = document.getElementById('home-stamp-rhythm');
+  if (rhythmEl) {
+    const cur = p.rhythm || 0;
+    rhythmEl.textContent = `💮 도장까지 ${cur}/8회`;
+    if (cur >= 7) rhythmEl.classList.add('almost');
+    else rhythmEl.classList.remove('almost');
+  }
+
+  // 2. 하단 4개 항목 (목표 5세트 완료)
+  const modes = ['speed', 'reverse', 'missing', 'order'];
+  modes.forEach(m => {
+    const el = document.getElementById(`home-stamp-${m}`);
+    if (el) {
+      const cur = p[m] || 0;
+      el.textContent = `💮 도장 ${cur}/5세트`;
+      if (cur >= 4) el.classList.add('almost');
+      else el.classList.remove('almost');
+    }
+  });
+
+  renderStampProgressDashboard();
+}
+
+function renderStampProgressDashboard() {
+  const dash = document.getElementById('stamp-progress-dashboard');
+  if (!dash) return;
+  const p = state.stampProgress || { rhythm: 0, speed: 0, reverse: 0, missing: 0, order: 0 };
+
+  const items = [
+    { name: '🎶 리듬 외우기', cur: p.rhythm || 0, max: 8, unit: '회' },
+    { name: '⚡ 순간 반응', cur: p.speed || 0, max: 5, unit: '세트' },
+    { name: '🔄 거꾸로 도전', cur: p.reverse || 0, max: 5, unit: '세트' },
+    { name: '🕵️ 구구 탐정', cur: p.missing || 0, max: 5, unit: '세트' },
+    { name: '🌱 순서대로', cur: p.order || 0, max: 5, unit: '세트' }
+  ];
+
+  dash.innerHTML = items.map(it => {
+    const isFull = it.cur >= it.max;
+    return `
+      <div class="stamp-prog-item">
+        <span class="stamp-prog-name">${it.name}</span>
+        <span class="stamp-prog-val ${isFull ? 'done' : ''}">${it.cur} / ${it.max}${it.unit}</span>
+      </div>
+    `;
+  }).join('');
 }
 
 function saveUserData() {
   localStorage.setItem('gugudan_total_stars', state.stars);
   localStorage.setItem('gugudan_stamps', JSON.stringify(state.stamps));
+  localStorage.setItem('gugudan_stamp_progress', JSON.stringify(state.stampProgress));
   localStorage.setItem('gugudan_reward_coupon', state.rewardCoupon);
   localStorage.setItem('gugudan_wrong_problems', JSON.stringify(state.wrongProblems));
 }
@@ -1110,7 +1181,35 @@ function finishGame() {
     stampSub = '열정 칭찬 💪';
   }
 
-  applyStampToResult(stampType, stampTitle, stampSub);
+  // [사용자 요청 반영] 하단 4개 항목: 5세트 완료 시 도장 1개 지급
+  const isTargetMode = ['speed', 'reverse', 'missing', 'order'].includes(g.mode);
+  let isEarnedBoardStamp = false;
+  let bannerProgressMsg = '';
+
+  if (isTargetMode) {
+    state.stampProgress[g.mode] = (state.stampProgress[g.mode] || 0) + 1;
+    const count = state.stampProgress[g.mode];
+    if (count >= 5) {
+      isEarnedBoardStamp = true;
+      state.stampProgress[g.mode] = 0;
+      bannerProgressMsg = `🎉 <strong>5세트 완주 대성공!</strong> 도장판에 도장이 쾅 찍혔어요! 💮 (5/5 완료)`;
+    } else {
+      bannerProgressMsg = `💮 도장판 도장까지: <strong>${count} / 5세트 완료</strong> (앞으로 ${5 - count}세트 더 풀면 도장 쾅!)`;
+    }
+  } else {
+    isEarnedBoardStamp = true;
+    bannerProgressMsg = `🎉 훈련 완료! 도장판에 도장이 쾅 찍혔어요! 💮`;
+  }
+
+  const progBanner = document.getElementById('res-stamp-progress-banner');
+  if (progBanner) {
+    progBanner.innerHTML = bannerProgressMsg;
+    if (isEarnedBoardStamp) progBanner.classList.add('earned');
+    else progBanner.classList.remove('earned');
+  }
+
+  const stampSubText = isEarnedBoardStamp ? '5세트 완주 💮' : `${state.stampProgress[g.mode] || 1}/5세트 달성`;
+  applyStampToResult(stampType, stampTitle, stampSubText, isEarnedBoardStamp);
 
   // 1위 최고 신기록 갱신 시: 특대형 폭죽 + 보너스 도장 +1개 쾅!
   const alertEl = document.getElementById('res-record-alert');
@@ -1126,6 +1225,7 @@ function finishGame() {
     });
     saveUserData();
     updateHeaderStampCount();
+    updateStampProgressUI();
     confetti.megaBurst();
   } else {
     if (alertEl) alertEl.style.display = 'none';
@@ -1148,7 +1248,7 @@ function finishGame() {
   }
 }
 
-function applyStampToResult(stampType, stampTitle, stampSub) {
+function applyStampToResult(stampType, stampTitle, stampSub, isEarnedBoardStamp) {
   const stampEl = document.getElementById('result-stamp');
   const stampMain = document.getElementById('stamp-main-text');
   const stampDate = document.getElementById('stamp-date-text');
@@ -1157,26 +1257,41 @@ function applyStampToResult(stampType, stampTitle, stampSub) {
   if (stampMain) stampMain.textContent = stampTitle;
   if (stampDate) stampDate.textContent = stampSub;
 
-  setTimeout(() => {
-    if (stampEl) stampEl.classList.add('stamped');
-    sounds.playStamp();
-    sounds.playFanfare();
-    confetti.burst(window.innerWidth / 2, window.innerHeight * 0.4, 65);
-  }, 300);
+  if (isEarnedBoardStamp) {
+    setTimeout(() => {
+      if (stampEl) {
+        stampEl.classList.remove('preview-mode');
+        stampEl.classList.add('stamped');
+      }
+      sounds.playStamp();
+      sounds.playFanfare();
+      confetti.burst(window.innerWidth / 2, window.innerHeight * 0.4, 65);
+    }, 300);
 
-  state.stamps.push({
-    type: stampType,
-    title: stampTitle,
-    date: new Date().toLocaleDateString('ko-KR')
-  });
-  saveUserData();
-  updateHeaderStampCount();
+    state.stamps.push({
+      type: stampType,
+      title: stampTitle,
+      date: new Date().toLocaleDateString('ko-KR')
+    });
+    saveUserData();
+    updateHeaderStampCount();
+    updateStampProgressUI();
+  } else {
+    if (stampEl) {
+      stampEl.classList.remove('stamped');
+      stampEl.classList.add('preview-mode');
+    }
+    sounds.playFanfare();
+    saveUserData();
+    updateStampProgressUI();
+  }
 }
 
 // --- 11. 칭찬 스탬프판 모달 시스템 ---
 function openStampModal() {
   sounds.playBeep(620, 0.05);
   renderStampBoard();
+  renderStampProgressDashboard();
   const modal = document.getElementById('stamp-modal');
   if (modal) modal.classList.add('open');
 }
@@ -1304,6 +1419,7 @@ function goHome() {
   updateHeaderStampCount();
   updateWrongReviewBtn();
   updateHomeBestTags();
+  updateStampProgressUI();
 }
 
 function confirmExitGame() {
@@ -1703,6 +1819,25 @@ function finishRhythmDan() {
   state.stars += 3;
   let bannerRecordMsg = '';
 
+  // [사용자 요청 반영] 리듬 구구단 최소 8번 완주 시 도장 1개 지급
+  state.stampProgress.rhythm = (state.stampProgress.rhythm || 0) + 1;
+  const rhythmCount = state.stampProgress.rhythm;
+  const isRhythmStampEarned = rhythmCount >= 8;
+
+  let rhythmStampMsg = '';
+  if (isRhythmStampEarned) {
+    state.stampProgress.rhythm = 0;
+    state.stamps.push({
+      type: 'gold',
+      title: '리듬 8회 완주',
+      date: new Date().toLocaleDateString('ko-KR')
+    });
+    rhythmStampMsg = `<br><span style="color:#d84315; font-weight:900;">💮 <strong>축하합니다! 리듬구구단 8회 완주 달성! 도장판에 도장 쾅!</strong> 💮 (8/8 완료)</span>`;
+    sounds.playStamp();
+  } else {
+    rhythmStampMsg = `<br><span style="color:#e65100; font-weight:bold;">💮 도장 획득까지: <strong>${rhythmCount} / 8회 완주</strong> (${8 - rhythmCount}회 남음)</span>`;
+  }
+
   if (recResult.isNewFirst) {
     // 👑 1위 신기록 갱신 시: 특대형 7단계 폭죽 + 보너스 도장 +1개 추가!
     confetti.megaBurst();
@@ -1710,39 +1845,30 @@ function finishRhythmDan() {
 
     state.stamps.push({
       type: 'gold',
-      title: `${dan}단 완주`,
-      date: new Date().toLocaleDateString('ko-KR')
-    });
-    state.stamps.push({
-      type: 'gold',
       title: `👑 ${dan}단 최고기록!`,
       date: `${elapsedSec.toFixed(1)}초 (${dirText})`
     });
 
-    bannerRecordMsg = ` 👑 <strong>최고 신기록 갱신 (${elapsedSec.toFixed(1)}초)! 보너스 도장 +1개 추가 쾅!</strong> 💮💮`;
+    bannerRecordMsg = ` 👑 <strong>최고 신기록 갱신 (${elapsedSec.toFixed(1)}초)! 1위 보너스 도장 +1개 쾅!</strong> 💮`;
   } else {
-    // 일반 완주 4연속 폭죽 + 도장 1개
+    // 일반 완주 4연속 폭죽
     confetti.burst(window.innerWidth / 2, window.innerHeight * 0.45, 75);
     setTimeout(() => confetti.burst(window.innerWidth * 0.25, window.innerHeight * 0.35, 70), 250);
     setTimeout(() => confetti.burst(window.innerWidth * 0.75, window.innerHeight * 0.35, 70), 500);
     setTimeout(() => confetti.burst(window.innerWidth / 2, window.innerHeight * 0.25, 95), 800);
     sounds.playFanfare();
 
-    state.stamps.push({
-      type: 'normal',
-      title: `${dan}단 완주`,
-      date: `${elapsedSec.toFixed(1)}초 (${dirText})`
-    });
     bannerRecordMsg = ` ⏱️ 완주 시간: <strong>${elapsedSec.toFixed(1)}초</strong>`;
   }
 
   saveUserData();
   updateUserBadge();
   updateHeaderStampCount();
+  updateStampProgressUI();
 
   const banner = document.getElementById('rhythm-status-msg');
   if (banner) {
-    banner.innerHTML = `🎉 <strong>[ ${dan}단 (${dirText}) ] 완주 대성공!</strong>${bannerRecordMsg} ⭐ +3 획득!`;
+    banner.innerHTML = `🎉 <strong>[ ${dan}단 (${dirText}) ] 완주 대성공!</strong>${bannerRecordMsg} ⭐ +3 획득!${rhythmStampMsg}`;
   }
 
   const counter = document.getElementById('rhythm-step-counter');
