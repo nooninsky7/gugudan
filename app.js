@@ -160,6 +160,20 @@ class ConfettiEffect {
     }
   }
 
+  megaBurst() {
+    // 7단계 연속 초대형 축하 폭죽 세레모니 (신기록 달성용!)
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    this.burst(w * 0.5, h * 0.45, 90);
+    setTimeout(() => this.burst(w * 0.25, h * 0.35, 80), 200);
+    setTimeout(() => this.burst(w * 0.75, h * 0.35, 80), 400);
+    setTimeout(() => this.burst(w * 0.4, h * 0.25, 95), 600);
+    setTimeout(() => this.burst(w * 0.6, h * 0.25, 95), 800);
+    setTimeout(() => this.burst(w * 0.2, h * 0.4, 85), 1000);
+    setTimeout(() => this.burst(w * 0.8, h * 0.4, 85), 1200);
+    setTimeout(() => this.burst(w * 0.5, h * 0.3, 120), 1400);
+  }
+
   animate() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -203,6 +217,7 @@ const state = {
   rewardCoupon: '맛있는 아이스크림 먹기 🍦',
   selectedDans: [2, 3, 4, 5, 6, 7, 8, 9],
   wrongProblems: [],
+  records: {}, // 모드/단수별 1~5위 시간 기록 보관함
   currentGame: {
     mode: 'speed', // 'speed', 'reverse', 'missing', 'order', 'review'
     questions: [],
@@ -214,7 +229,10 @@ const state = {
     currentWrongInRound: [],
     timerInterval: null,
     timeLeftPercent: 100,
-    questionStartTime: 0
+    questionStartTime: 0,
+    roundStartTime: 0,
+    liveTimerInterval: null,
+    isStarted: false
   },
   rhythmTrainer: {
     dan: 2,
@@ -224,7 +242,9 @@ const state = {
     orderList: [1, 2, 3, 4, 5, 6, 7, 8, 9],
     stepTimer: null,
     revealTimer: null,
-    isRevealed: false
+    isRevealed: false,
+    startTime: 0,
+    liveTimerInterval: null
   }
 };
 
@@ -283,9 +303,19 @@ function loadSavedData() {
     }
   }
 
+  const savedRecords = localStorage.getItem('gugudan_time_records');
+  if (savedRecords) {
+    try {
+      state.records = JSON.parse(savedRecords) || {};
+    } catch (e) {
+      state.records = {};
+    }
+  }
+
   updateUserBadge();
   updateHeaderStampCount();
   updateWrongReviewBtn();
+  updateHomeBestTags();
 }
 
 function saveUserData() {
@@ -293,6 +323,103 @@ function saveUserData() {
   localStorage.setItem('gugudan_stamps', JSON.stringify(state.stamps));
   localStorage.setItem('gugudan_reward_coupon', state.rewardCoupon);
   localStorage.setItem('gugudan_wrong_problems', JSON.stringify(state.wrongProblems));
+}
+
+// --- 4-1. 시간 기록 및 Top 5 랭킹 시스템 ---
+function getRecords(key) {
+  if (!state.records[key]) state.records[key] = [];
+  return state.records[key];
+}
+
+function saveRecord(key, timeSec) {
+  if (!state.records[key]) state.records[key] = [];
+  const list = state.records[key];
+  
+  const parsedTime = parseFloat(timeSec.toFixed(1));
+  const prevBest = list.length > 0 ? list[0].time : Infinity;
+  const isNewFirst = parsedTime < prevBest || list.length === 0;
+
+  list.push({
+    time: parsedTime,
+    date: new Date().toLocaleDateString('ko-KR')
+  });
+
+  // 짧은 시간 순서대로(오름차순) 정렬: 1위가 가장 짧은 시간
+  list.sort((a, b) => a.time - b.time);
+
+  // 상위 5개만 유지
+  state.records[key] = list.slice(0, 5);
+
+  localStorage.setItem('gugudan_time_records', JSON.stringify(state.records));
+
+  const rank = state.records[key].findIndex(r => r.time === parsedTime) + 1;
+  const isTop5 = rank >= 1 && rank <= 5;
+
+  return {
+    isNewFirst,
+    isTop5,
+    rank,
+    records: state.records[key],
+    prevBest
+  };
+}
+
+function getModeTitle(mode) {
+  const map = {
+    speed: '순간 반응 팡팡',
+    reverse: '거꾸로 도전',
+    missing: '구구단 탐정',
+    order: '차근차근 순서대로',
+    review: '오답 다시 풀기'
+  };
+  return map[mode] || mode;
+}
+
+function getDanLabel(danKey) {
+  return danKey === 'all' ? '전체' : `${danKey}단`;
+}
+
+function updateHomeBestTags() {
+  const modes = ['speed', 'reverse', 'missing', 'order'];
+  modes.forEach(mode => {
+    const el = document.getElementById(`home-best-${mode}`);
+    if (el) {
+      let best = Infinity;
+      // 'all' 포함 모든 단수 중 최고 기록 검색
+      const keys = [`quiz_${mode}_all`];
+      for (let d = 2; d <= 9; d++) keys.push(`quiz_${mode}_${d}`);
+      keys.forEach(k => {
+        const recs = getRecords(k);
+        if (recs.length > 0 && recs[0].time < best) best = recs[0].time;
+      });
+
+      if (best < Infinity) {
+        el.textContent = `👑 1위: ${best}초`;
+        el.classList.add('has-record');
+      } else {
+        el.textContent = `👑 1위: —`;
+        el.classList.remove('has-record');
+      }
+    }
+  });
+
+  const rhythmEl = document.getElementById('home-best-rhythm');
+  if (rhythmEl) {
+    let best = Infinity;
+    for (let d = 2; d <= 9; d++) {
+      ['forward', 'reverse'].forEach(dir => {
+        const recs = getRecords(`rhythm_${d}_${dir}`);
+        if (recs.length > 0 && recs[0].time < best) best = recs[0].time;
+      });
+    }
+    if (best < Infinity) {
+      rhythmEl.textContent = `👑 1위: ${best}초`;
+      rhythmEl.classList.add('has-record');
+    } else {
+      rhythmEl.textContent = `👑 1위: —`;
+      rhythmEl.classList.remove('has-record');
+    }
+  }
 }
 
 function updateUserBadge() {
@@ -480,6 +607,11 @@ function startGame(mode) {
   // 첫 번째 문제 화면을 또렷하게 렌더링해두고 (타이머는 아직 돌지 않음)
   loadQuestion(false);
 
+  // 상단 스톱워치 초기화 및 현재 모드/단수 1위 기록 표시
+  const stopwatchEl = document.getElementById('game-stopwatch');
+  if (stopwatchEl) stopwatchEl.textContent = '⏱️ 0.0초';
+  updateGameBestRecordTag();
+
   // 중앙에 또렷한 시작 버튼 표시 (흐림 블러 없음!)
   const overlay = document.getElementById('game-start-overlay');
   if (overlay) overlay.style.display = 'flex';
@@ -491,8 +623,35 @@ function startCurrentGamePlay() {
 
   sounds.playFanfare();
   state.currentGame.isStarted = true;
+  state.currentGame.roundStartTime = Date.now();
   state.currentGame.questionStartTime = Date.now();
+
+  if (state.currentGame.liveTimerInterval) clearInterval(state.currentGame.liveTimerInterval);
+  state.currentGame.liveTimerInterval = setInterval(updateGameLiveTimer, 100);
+  updateGameLiveTimer();
+
   startTimerGauge();
+}
+
+function updateGameLiveTimer() {
+  const el = document.getElementById('game-stopwatch');
+  if (!el || !state.currentGame || !state.currentGame.isStarted) return;
+  const sec = ((Date.now() - state.currentGame.roundStartTime) / 1000).toFixed(1);
+  el.textContent = `⏱️ ${sec}초`;
+}
+
+function updateGameBestRecordTag() {
+  const g = state.currentGame;
+  if (!g) return;
+  const tag = document.getElementById('game-best-record-tag');
+  if (!tag) return;
+  const danKey = state.selectedDans.length === 1 ? state.selectedDans[0].toString() : 'all';
+  const recs = getRecords(`quiz_${g.mode}_${danKey}`);
+  if (recs.length > 0) {
+    tag.textContent = `👑 1위: ${recs[0].time}초`;
+  } else {
+    tag.textContent = `👑 1위: 도전!`;
+  }
 }
 
 // 퀴즈 화면 안에서 실시간으로 단을 변경하는 함수
@@ -519,9 +678,11 @@ function changeGameDan(dan) {
   });
 
   updateIngameDanTabs();
+  updateGameBestRecordTag();
 
   // 기존 타이머 정지 후 대기 상태로 재시작!
   if (state.currentGame.timerInterval) clearInterval(state.currentGame.timerInterval);
+  if (state.currentGame.liveTimerInterval) clearInterval(state.currentGame.liveTimerInterval);
   startGame(state.currentGame.mode);
 }
 
@@ -879,6 +1040,13 @@ function setupKeyboardListener() {
 function finishGame() {
   const g = state.currentGame;
   if (g.timerInterval) clearInterval(g.timerInterval);
+  if (g.liveTimerInterval) clearInterval(g.liveTimerInterval);
+
+  const elapsedSec = (Date.now() - (g.roundStartTime || Date.now())) / 1000;
+  const danKey = state.selectedDans.length === 1 ? state.selectedDans[0].toString() : 'all';
+  const recordKey = `quiz_${g.mode}_${danKey}`;
+  const recResult = saveRecord(recordKey, elapsedSec);
+  updateHomeBestTags();
 
   switchScreen('screen-result');
 
@@ -886,6 +1054,9 @@ function finishGame() {
   document.getElementById('res-total').textContent = g.questions.length;
   document.getElementById('res-stars').textContent = g.correctCount + (g.maxCombo >= 3 ? 2 : 0);
   document.getElementById('res-max-combo').textContent = g.maxCombo;
+
+  const timeEl = document.getElementById('res-elapsed-time');
+  if (timeEl) timeEl.textContent = `${elapsedSec.toFixed(1)}초`;
 
   const titleEl = document.getElementById('result-title');
   const subEl = document.getElementById('result-subtitle');
@@ -920,6 +1091,28 @@ function finishGame() {
   }
 
   applyStampToResult(stampType, stampTitle, stampSub);
+
+  // 1위 최고 신기록 갱신 시: 특대형 폭죽 + 보너스 도장 +1개 쾅!
+  const alertEl = document.getElementById('res-record-alert');
+  if (recResult.isNewFirst && g.correctCount > 0) {
+    if (alertEl) {
+      alertEl.style.display = 'block';
+      alertEl.innerHTML = `👑 <strong>최고 신기록 달성 (${elapsedSec.toFixed(1)}초)!</strong> 1위 갱신으로 <strong>보너스 도장 +1개</strong> 쾅! 💮`;
+    }
+    state.stamps.push({
+      type: 'gold',
+      title: `👑 ${getModeTitle(g.mode)} 1위`,
+      date: `${elapsedSec.toFixed(1)}초 (${getDanLabel(danKey)})`
+    });
+    saveUserData();
+    updateHeaderStampCount();
+    confetti.megaBurst();
+  } else {
+    if (alertEl) alertEl.style.display = 'none';
+  }
+
+  // 퀴즈 결과 화면 Top 5 랭킹 보드 표시
+  renderResultTop5(recordKey, elapsedSec, recResult.isNewFirst);
 
   const wrongWrap = document.getElementById('result-wrong-list');
   const chipsContainer = document.getElementById('wrong-chips-container');
@@ -1080,10 +1273,17 @@ function restartCurrentGame() {
 function goHome() {
   sounds.playBeep(480, 0.05);
   stopRhythmTimer();
+  if (state.rhythmTrainer.liveTimerInterval) {
+    clearInterval(state.rhythmTrainer.liveTimerInterval);
+  }
+  if (state.currentGame && state.currentGame.liveTimerInterval) {
+    clearInterval(state.currentGame.liveTimerInterval);
+  }
   switchScreen('screen-home');
   updateUserBadge();
   updateHeaderStampCount();
   updateWrongReviewBtn();
+  updateHomeBestTags();
 }
 
 function confirmExitGame() {
@@ -1124,6 +1324,13 @@ function showRhythmReadyState() {
   state.rhythmTrainer.currentIndex = 0;
   state.rhythmTrainer.isRevealed = false;
 
+  const timerBadge = document.getElementById('rhythm-live-timer');
+  if (timerBadge) timerBadge.textContent = '⏱️ 0.0초';
+  if (state.rhythmTrainer.liveTimerInterval) {
+    clearInterval(state.rhythmTrainer.liveTimerInterval);
+  }
+  updateRhythmRankPanel();
+
   const playBtn = document.getElementById('btn-rhythm-play');
   if (playBtn) {
     playBtn.textContent = '▶ 시작하기';
@@ -1150,6 +1357,11 @@ function handleRhythmStartOrToggle() {
   if (!rt.isPlaying && rt.currentIndex === 0) {
     if (overlay) overlay.style.display = 'none';
     rt.isPlaying = true;
+    rt.startTime = Date.now();
+
+    if (rt.liveTimerInterval) clearInterval(rt.liveTimerInterval);
+    rt.liveTimerInterval = setInterval(updateRhythmLiveTimer, 100);
+    updateRhythmLiveTimer();
 
     sounds.playFanfare();
 
@@ -1172,6 +1384,9 @@ function handleRhythmStartOrToggle() {
 
 function exitRhythmToHome() {
   stopRhythmTimer();
+  if (state.rhythmTrainer.liveTimerInterval) {
+    clearInterval(state.rhythmTrainer.liveTimerInterval);
+  }
   goHome();
 }
 
@@ -1182,6 +1397,7 @@ function selectRhythmDan(dan) {
   setupRhythmOrderList();
   renderRhythmBoard();
   showRhythmReadyState();
+  updateRhythmRankPanel();
 }
 
 function setRhythmDirection(dir) {
@@ -1191,6 +1407,7 @@ function setRhythmDirection(dir) {
   setupRhythmOrderList();
   renderRhythmBoard();
   showRhythmReadyState();
+  updateRhythmRankPanel();
 }
 
 function updateRhythmDanTabs() {
@@ -1233,8 +1450,8 @@ function setupRhythmScreenListener() {
 
   // 태블릿/모바일/PC 어디서든 화면 전체 터치 인식
   rhythmScreen.addEventListener('click', (e) => {
-    // 상단 바의 버튼들(홈, 단 선택, 방향, 일시정지) 및 시작 오버레이 클릭은 제외
-    if (e.target.closest('.rhythm-top-bar') || e.target.closest('.rhythm-start-overlay')) {
+    // 상단 바의 버튼들(홈, 단 선택, 방향, 일시정지) 및 시작 오버레이, 랭킹 패널 클릭은 제외
+    if (e.target.closest('.rhythm-top-bar') || e.target.closest('.rhythm-start-overlay') || e.target.closest('.rhythm-rank-panel')) {
       return;
     }
     handleRhythmInteraction();
@@ -1383,6 +1600,9 @@ function toggleRhythmPlay() {
   if (rt.isPlaying) {
     rt.isPlaying = false;
     stopRhythmTimer();
+    if (rt.liveTimerInterval) clearInterval(rt.liveTimerInterval);
+    rt.pausedAt = Date.now();
+
     if (btn) {
       btn.textContent = '▶ 계속하기';
       btn.className = 'ctrl-btn btn-play-pause btn-rhythm-main-act';
@@ -1393,6 +1613,13 @@ function toggleRhythmPlay() {
     }
   } else {
     rt.isPlaying = true;
+    if (rt.pausedAt) {
+      rt.startTime += (Date.now() - rt.pausedAt);
+      rt.pausedAt = null;
+    }
+    if (rt.liveTimerInterval) clearInterval(rt.liveTimerInterval);
+    rt.liveTimerInterval = setInterval(updateRhythmLiveTimer, 100);
+
     if (btn) {
       btn.textContent = '⏸ 일시정지';
       btn.className = 'ctrl-btn btn-play-pause';
@@ -1411,16 +1638,40 @@ function restartRhythm() {
   stopRhythmTimer();
   state.rhythmTrainer.currentIndex = 0;
   state.rhythmTrainer.isRevealed = false;
+  if (state.rhythmTrainer.liveTimerInterval) {
+    clearInterval(state.rhythmTrainer.liveTimerInterval);
+  }
   setupRhythmOrderList();
   renderRhythmBoard();
   showRhythmReadyState();
 }
 
+function updateRhythmLiveTimer() {
+  const el = document.getElementById('rhythm-live-timer');
+  if (!el || !state.rhythmTrainer.isPlaying) return;
+  const sec = ((Date.now() - state.rhythmTrainer.startTime) / 1000).toFixed(1);
+  el.textContent = `⏱️ ${sec}초`;
+}
+
 function finishRhythmDan() {
   stopRhythmTimer();
   state.rhythmTrainer.isPlaying = false;
+  if (state.rhythmTrainer.liveTimerInterval) {
+    clearInterval(state.rhythmTrainer.liveTimerInterval);
+  }
+
+  const elapsedSec = (Date.now() - (state.rhythmTrainer.startTime || Date.now())) / 1000;
+  const timerBadge = document.getElementById('rhythm-live-timer');
+  if (timerBadge) timerBadge.textContent = `⏱️ ${elapsedSec.toFixed(1)}초`;
 
   const dan = state.rhythmTrainer.dan;
+  const dir = state.rhythmTrainer.direction;
+  const dirText = dir === 'forward' ? '순서대로' : '거꾸로';
+  const recordKey = `rhythm_${dan}_${dir}`;
+
+  const recResult = saveRecord(recordKey, elapsedSec);
+  updateRhythmRankPanel();
+  updateHomeBestTags();
 
   const lastIdx = state.rhythmTrainer.orderList.length - 1;
   const lastRow = document.getElementById(`r-row-${lastIdx}`);
@@ -1429,21 +1680,49 @@ function finishRhythmDan() {
     lastRow.classList.add('done');
   }
 
-  sounds.playFanfare();
-
-  // 4연속 대형 폭죽 연출
-  confetti.burst(window.innerWidth / 2, window.innerHeight * 0.45, 75);
-  setTimeout(() => confetti.burst(window.innerWidth * 0.25, window.innerHeight * 0.35, 70), 250);
-  setTimeout(() => confetti.burst(window.innerWidth * 0.75, window.innerHeight * 0.35, 70), 500);
-  setTimeout(() => confetti.burst(window.innerWidth / 2, window.innerHeight * 0.25, 95), 800);
-
   state.stars += 3;
+  let bannerRecordMsg = '';
+
+  if (recResult.isNewFirst) {
+    // 👑 1위 신기록 갱신 시: 특대형 7단계 폭죽 + 보너스 도장 +1개 추가!
+    confetti.megaBurst();
+    sounds.playFanfare();
+
+    state.stamps.push({
+      type: 'gold',
+      title: `${dan}단 완주`,
+      date: new Date().toLocaleDateString('ko-KR')
+    });
+    state.stamps.push({
+      type: 'gold',
+      title: `👑 ${dan}단 최고기록!`,
+      date: `${elapsedSec.toFixed(1)}초 (${dirText})`
+    });
+
+    bannerRecordMsg = ` 👑 <strong>최고 신기록 갱신 (${elapsedSec.toFixed(1)}초)! 보너스 도장 +1개 추가 쾅!</strong> 💮💮`;
+  } else {
+    // 일반 완주 4연속 폭죽 + 도장 1개
+    confetti.burst(window.innerWidth / 2, window.innerHeight * 0.45, 75);
+    setTimeout(() => confetti.burst(window.innerWidth * 0.25, window.innerHeight * 0.35, 70), 250);
+    setTimeout(() => confetti.burst(window.innerWidth * 0.75, window.innerHeight * 0.35, 70), 500);
+    setTimeout(() => confetti.burst(window.innerWidth / 2, window.innerHeight * 0.25, 95), 800);
+    sounds.playFanfare();
+
+    state.stamps.push({
+      type: 'normal',
+      title: `${dan}단 완주`,
+      date: `${elapsedSec.toFixed(1)}초 (${dirText})`
+    });
+    bannerRecordMsg = ` ⏱️ 완주 시간: <strong>${elapsedSec.toFixed(1)}초</strong>`;
+  }
+
   saveUserData();
   updateUserBadge();
+  updateHeaderStampCount();
 
   const banner = document.getElementById('rhythm-status-msg');
   if (banner) {
-    banner.innerHTML = `🎉 <strong>[ ${dan}단 ] 완주 대성공!</strong> 9문제 모두 멋지게 완성했어요! ⭐ +3 획득!`;
+    banner.innerHTML = `🎉 <strong>[ ${dan}단 (${dirText}) ] 완주 대성공!</strong>${bannerRecordMsg} ⭐ +3 획득!`;
   }
 
   const counter = document.getElementById('rhythm-step-counter');
@@ -1455,4 +1734,202 @@ function finishRhythmDan() {
     playBtn.className = 'ctrl-btn btn-play-pause btn-rhythm-main-act';
     playBtn.onclick = restartRhythm;
   }
+}
+
+// 리듬 구구단 한쪽 구석 Top 5 패널 렌더링
+function updateRhythmRankPanel() {
+  const dan = state.rhythmTrainer.dan;
+  const dir = state.rhythmTrainer.direction;
+  const dirText = dir === 'forward' ? '순서대로' : '거꾸로';
+  const key = `rhythm_${dan}_${dir}`;
+
+  const titleEl = document.getElementById('r-rank-title');
+  if (titleEl) titleEl.textContent = `${dan}단 (${dirText})`;
+
+  const listEl = document.getElementById('r-rank-list');
+  if (!listEl) return;
+
+  const records = getRecords(key);
+  const medals = ['🥇 1위', '🥈 2위', '🥉 3위', '4위', '5위'];
+  let html = '';
+
+  for (let i = 0; i < 5; i++) {
+    if (records[i]) {
+      const isFirst = i === 0;
+      html += `
+        <div class="r-rank-row ${isFirst ? 'rank-1' : ''}">
+          <span class="r-rank-pos">${medals[i]}</span>
+          <span class="r-rank-time">${records[i].time}초</span>
+          <span class="r-rank-date">${records[i].date}</span>
+        </div>
+      `;
+    } else {
+      html += `
+        <div class="r-rank-row empty">
+          <span class="r-rank-pos">${medals[i]}</span>
+          <span class="r-rank-time">—</span>
+          <span class="r-rank-date">도전 대기 ✨</span>
+        </div>
+      `;
+    }
+  }
+  listEl.innerHTML = html;
+}
+
+// 퀴즈 결과 화면의 Top 5 랭킹 보드 렌더링
+function renderResultTop5(recordKey, currentSec, isNewFirst) {
+  const container = document.getElementById('res-top5-list');
+  const tagEl = document.getElementById('res-top5-mode-tag');
+  if (!container) return;
+
+  const records = getRecords(recordKey);
+  const parts = recordKey.split('_'); // ['quiz', mode, danKey]
+  const modeName = getModeTitle(parts[1]);
+  const danName = getDanLabel(parts[2]);
+  if (tagEl) tagEl.textContent = `[ ${modeName} - ${danName} ]`;
+
+  let html = '';
+  const medals = ['🥇 1위', '🥈 2위', '🥉 3위', '4위', '5위'];
+
+  for (let i = 0; i < 5; i++) {
+    if (records[i]) {
+      const isCurrent = Math.abs(records[i].time - parseFloat(currentSec.toFixed(1))) < 0.05;
+      const highlightClass = isCurrent ? 'highlight-new' : (i === 0 ? 'top-1' : '');
+      html += `
+        <div class="top5-item ${highlightClass}">
+          <span class="top5-rank">${medals[i]}</span>
+          <span class="top5-time">${records[i].time}초</span>
+          <span class="top5-date">${records[i].date}${isCurrent ? ' (방금!)' : ''}</span>
+        </div>
+      `;
+    } else {
+      html += `
+        <div class="top5-item empty">
+          <span class="top5-rank">${medals[i]}</span>
+          <span class="top5-time">—</span>
+          <span class="top5-date">기록 도전 중 ✨</span>
+        </div>
+      `;
+    }
+  }
+  container.innerHTML = html;
+}
+
+// ========================================================
+// --- 14. 명예의 전당 (Top 5 랭킹) 모달 컨트롤러 ---
+// ========================================================
+let currentRankingTab = 'rhythm';
+let currentRankingDan = '2';
+let currentRankingRhythmDir = 'forward';
+
+function openRankingModal() {
+  const modal = document.getElementById('ranking-modal');
+  if (modal) modal.classList.add('active');
+  sounds.playBeep(520, 0.05);
+  renderRankingModalContent();
+}
+
+function closeRankingModal(event) {
+  if (event && event.target !== event.currentTarget) return;
+  const modal = document.getElementById('ranking-modal');
+  if (modal) modal.classList.remove('active');
+}
+
+function switchRankingTab(tab) {
+  currentRankingTab = tab;
+  sounds.playBeep(580, 0.04);
+
+  const tabs = document.querySelectorAll('.r-tab-btn');
+  tabs.forEach(btn => {
+    if (btn.getAttribute('data-tab') === tab) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+
+  renderRankingModalContent();
+}
+
+function setRankingDan(dan) {
+  currentRankingDan = dan;
+  sounds.playBeep(520, 0.04);
+  renderRankingModalContent();
+}
+
+function setRankingRhythmDir(dir) {
+  currentRankingRhythmDir = dir;
+  sounds.playBeep(520, 0.04);
+  renderRankingModalContent();
+}
+
+function renderRankingModalContent() {
+  const filterContainer = document.getElementById('ranking-dan-filter');
+  const top5Container = document.getElementById('ranking-top5-container');
+  if (!filterContainer || !top5Container) return;
+
+  if (currentRankingTab === 'rhythm') {
+    let danHtml = '<div class="r-dan-chips-row">';
+    for (let d = 2; d <= 9; d++) {
+      const active = (currentRankingDan === d.toString()) ? 'active' : '';
+      danHtml += `<button class="r-filter-chip ${active}" onclick="setRankingDan('${d}')">${d}단</button>`;
+    }
+    danHtml += '</div>';
+
+    danHtml += `
+      <div class="r-dir-chips-row" style="margin-top: 6px;">
+        <button class="r-filter-chip ${currentRankingRhythmDir === 'forward' ? 'active' : ''}" onclick="setRankingRhythmDir('forward')">순서대로 (1➔9)</button>
+        <button class="r-filter-chip ${currentRankingRhythmDir === 'reverse' ? 'active' : ''}" onclick="setRankingRhythmDir('reverse')">거꾸로 (9➔1)</button>
+      </div>
+    `;
+    filterContainer.innerHTML = danHtml;
+
+    const recordKey = `rhythm_${currentRankingDan}_${currentRankingRhythmDir}`;
+    const dirText = currentRankingRhythmDir === 'forward' ? '순서대로' : '거꾸로';
+    renderRankingModalList(recordKey, `리듬 구구단 [ ${currentRankingDan}단 (${dirText}) ]`);
+  } else {
+    let danHtml = '<div class="r-dan-chips-row">';
+    const dans = ['all', '2', '3', '4', '5', '6', '7', '8', '9'];
+    dans.forEach(d => {
+      const label = d === 'all' ? '전체' : `${d}단`;
+      const active = (currentRankingDan === d) ? 'active' : '';
+      danHtml += `<button class="r-filter-chip ${active}" onclick="setRankingDan('${d}')">${label}</button>`;
+    });
+    danHtml += '</div>';
+    filterContainer.innerHTML = danHtml;
+
+    const recordKey = `quiz_${currentRankingTab}_${currentRankingDan}`;
+    const modeName = getModeTitle(currentRankingTab);
+    const danName = getDanLabel(currentRankingDan);
+    renderRankingModalList(recordKey, `${modeName} [ ${danName} ]`);
+  }
+}
+
+function renderRankingModalList(key, title) {
+  const top5Container = document.getElementById('ranking-top5-container');
+  if (!top5Container) return;
+
+  const records = getRecords(key);
+  const medals = ['🥇 1위', '🥈 2위', '🥉 3위', '4위', '5위'];
+
+  let html = `<div class="rank-modal-header-tag">🏆 ${title} Top 5</div><div class="rank-modal-rows">`;
+  for (let i = 0; i < 5; i++) {
+    if (records[i]) {
+      const isFirst = i === 0;
+      html += `
+        <div class="r-modal-row ${isFirst ? 'rank-1' : ''}">
+          <span class="r-modal-pos">${medals[i]}</span>
+          <span class="r-modal-time">⏱️ ${records[i].time}초</span>
+          <span class="r-modal-date">📅 ${records[i].date}</span>
+        </div>
+      `;
+    } else {
+      html += `
+        <div class="r-modal-row empty">
+          <span class="r-modal-pos">${medals[i]}</span>
+          <span class="r-modal-time">—</span>
+          <span class="r-modal-date">기록 도전 중 ✨</span>
+        </div>
+      `;
+    }
+  }
+  html += '</div>';
+  top5Container.innerHTML = html;
 }

@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2.1">
+  <link rel="stylesheet" href="style.css?v=3.0">
 </head>
 <body>
   <div id="app">
@@ -38,6 +38,9 @@
         <div class="header-right">
           <button class="btn-stampbook-open" onclick="openStampModal()" title="내 칭찬 도장판 보기">
             💮 도장판 <span id="header-stamp-count">(0/20)</span>
+          </button>
+          <button class="btn-hall-open" onclick="openRankingModal()" title="명예의 전당 Top 5 랭킹">
+            🏆 명예의 전당
           </button>
           <button class="btn-coupon-open" onclick="openCouponModal()" title="부모님 보상 쿠폰함">
             🎁 쿠폰함
@@ -72,7 +75,10 @@
             <p>1부터 9까지 순서대로 굵어지면 3초 안에 답을 말하고 4초에 정답 확인! (거꾸로도 가능)</p>
           </div>
         </div>
-        <button class="btn-rhythm-start">시작하기 ▶</button>
+        <div class="rhythm-hero-right">
+          <div class="rhythm-best-pill" id="home-best-rhythm">👑 최고: —</div>
+          <button class="btn-rhythm-start">시작하기 ▶</button>
+        </div>
       </div>
 
       <!-- 게임 모드 카드 그리드 (핵심 4대 모드) -->
@@ -80,6 +86,7 @@
         <!-- 모드 1: 순간 반응 팡팡 -->
         <button class="mode-card card-speed" onclick="startGame('speed')">
           <span class="badge-recommend">강력추천</span>
+          <div class="mode-best-pill" id="home-best-speed">👑 1위: —</div>
           <div class="mode-icon">⚡</div>
           <div class="mode-text">
             <h3>순간 반응 팡팡!</h3>
@@ -90,6 +97,7 @@
         <!-- 모드 2: 거꾸로 도전 -->
         <button class="mode-card card-reverse" onclick="startGame('reverse')">
           <span class="badge-special">역순마스터</span>
+          <div class="mode-best-pill" id="home-best-reverse">👑 1위: —</div>
           <div class="mode-icon">🔄</div>
           <div class="mode-text">
             <h3>거꾸로 도전!</h3>
@@ -99,6 +107,7 @@
 
         <!-- 모드 3: 구구단 탐정 (빈칸 채우기) -->
         <button class="mode-card card-detective" onclick="startGame('missing')">
+          <div class="mode-best-pill" id="home-best-missing">👑 1위: —</div>
           <div class="mode-icon">🕵️</div>
           <div class="mode-text">
             <h3>구구단 탐정</h3>
@@ -108,6 +117,7 @@
 
         <!-- 모드 4: 차근차근 순서대로 -->
         <button class="mode-card card-step" onclick="startGame('order')">
+          <div class="mode-best-pill" id="home-best-order">👑 1위: —</div>
           <div class="mode-icon">🌱</div>
           <div class="mode-text">
             <h3>차근차근 순서대로</h3>
@@ -144,6 +154,12 @@
           <button class="ingame-dan-btn" data-dan="7" onclick="changeGameDan(7)">7단</button>
           <button class="ingame-dan-btn" data-dan="8" onclick="changeGameDan(8)">8단</button>
           <button class="ingame-dan-btn" data-dan="9" onclick="changeGameDan(9)">9단</button>
+        </div>
+
+        <!-- 실시간 스톱워치 & 1위 목표 표시 -->
+        <div class="game-timer-badge-wrap">
+          <span class="game-stopwatch" id="game-stopwatch">⏱️ 0.0초</span>
+          <span class="top-record-tag" id="game-best-record-tag">👑 1위: —</span>
         </div>
 
         <div class="progress-container">
@@ -266,12 +282,32 @@
         <div class="rhythm-status-msg" id="rhythm-status-msg">
           준비가 되면 상단의 <strong>[ ▶ 시작하기 ]</strong> 버튼을 눌러주세요!
         </div>
-        <div class="rhythm-step-counter" id="rhythm-step-counter">0 / 9</div>
+        <div class="rhythm-top-stats">
+          <span class="rhythm-live-timer" id="rhythm-live-timer">⏱️ 0.0초</span>
+          <div class="rhythm-step-counter" id="rhythm-step-counter">0 / 9</div>
+        </div>
       </div>
 
-      <!-- 위에서 아래로 1~9 순서대로 다 나오는 세로 List 보드 -->
-      <div class="rhythm-list-container" id="rhythm-board">
-        <!-- 9개의 세로 행(Row)이 렌더링됨 -->
+      <!-- 본문 영역: 가운데 리스트 + 오른쪽 구석 Top 5 명예의 전당 위젯 -->
+      <div class="rhythm-body-wrap">
+        <!-- 위에서 아래로 1~9 순서대로 다 나오는 세로 List 보드 -->
+        <div class="rhythm-list-container" id="rhythm-board">
+          <!-- 9개의 세로 행(Row)이 렌더링됨 -->
+        </div>
+
+        <!-- 한쪽 구석 Top 5 랭킹 패널 -->
+        <div class="rhythm-rank-panel" id="rhythm-rank-panel">
+          <div class="r-rank-header">
+            <span class="r-rank-icon">🏆</span>
+            <div class="r-rank-title-wrap">
+              <span class="r-rank-title" id="r-rank-title">2단 (순서대로)</span>
+              <span class="r-rank-sub">명예의 전당 Top 5</span>
+            </div>
+          </div>
+          <div class="r-rank-list" id="r-rank-list">
+            <!-- 1위 ~ 5위 렌더링 -->
+          </div>
+        </div>
       </div>
 
       <!-- 시작 전 큼직한 중앙 시작 버튼 오버레이 -->
@@ -305,12 +341,31 @@
             <span class="score-value highlight"><span id="res-correct">0</span> / <span id="res-total">10</span></span>
           </div>
           <div class="score-item">
+            <span class="score-label">총 푼 시간</span>
+            <span class="score-value time-val" id="res-elapsed-time">0.0초</span>
+          </div>
+          <div class="score-item">
             <span class="score-label">획득 별</span>
             <span class="score-value">⭐ +<span id="res-stars">0</span></span>
           </div>
           <div class="score-item">
             <span class="score-label">최대 콤보</span>
             <span class="score-value">🔥 <span id="res-max-combo">0</span>회</span>
+          </div>
+        </div>
+
+        <div class="res-record-alert" id="res-record-alert" style="display: none;">
+          👑 <strong>최고 신기록 달성!</strong> 1위 갱신으로 <strong>도장 +1개 보너스</strong> 획득! 💮
+        </div>
+
+        <!-- 퀴즈 결과 화면의 Top 5 랭킹 보드 -->
+        <div class="result-top5-card" id="result-top5-card">
+          <div class="res-top5-header">
+            <span class="res-top5-badge">🏆 명예의 전당 Top 5</span>
+            <span class="res-top5-mode-tag" id="res-top5-mode-tag">[순간반응 팡팡 - 전체]</span>
+          </div>
+          <div class="res-top5-list" id="res-top5-list">
+            <!-- 1~5위 렌더링 -->
           </div>
         </div>
 
@@ -400,10 +455,36 @@
       </div>
     </div>
 
+    <!-- ================= 8. 명예의 전당 (Top 5 랭킹) 모달 ================= -->
+    <div class="modal-overlay" id="ranking-modal" onclick="closeRankingModal(event)">
+      <div class="modal-card modal-ranking-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2>🏆 명예의 전당 (Top 5 랭킹)</h2>
+          <button class="modal-close-btn" onclick="closeRankingModal()">✕</button>
+        </div>
+        <p class="modal-subtitle">과거에 달성한 최고 기록 1위부터 5위까지 한눈에 확인해보세요!</p>
+
+        <!-- 모드 선택 탭 -->
+        <div class="ranking-mode-tabs">
+          <button class="r-tab-btn active" data-tab="rhythm" onclick="switchRankingTab('rhythm')">🎶 리듬 구구단</button>
+          <button class="r-tab-btn" data-tab="speed" onclick="switchRankingTab('speed')">⚡ 순간 반응</button>
+          <button class="r-tab-btn" data-tab="reverse" onclick="switchRankingTab('reverse')">🔄 거꾸로 도전</button>
+          <button class="r-tab-btn" data-tab="missing" onclick="switchRankingTab('missing')">🕵️ 구구단 탐정</button>
+          <button class="r-tab-btn" data-tab="order" onclick="switchRankingTab('order')">🌱 순서대로</button>
+        </div>
+
+        <!-- 단 선택 필터 -->
+        <div class="ranking-dan-filter" id="ranking-dan-filter"></div>
+
+        <!-- Top 5 랭킹 보드 목록 -->
+        <div class="ranking-top5-container" id="ranking-top5-container"></div>
+      </div>
+    </div>
+
     <!-- 캔버스 (폭죽 파티클 효과) -->
     <canvas id="confetti-canvas"></canvas>
   </div>
 
-  <script src="app.js?v=2.1"></script>
+  <script src="app.js?v=3.0"></script>
 </body>
 </html>
