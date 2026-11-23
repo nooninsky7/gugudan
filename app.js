@@ -275,12 +275,41 @@ function loadSavedData() {
   const savedStars = localStorage.getItem('gugudan_total_stars');
   if (savedStars) state.stars = parseInt(savedStars, 10) || 0;
 
-  const savedStamps = localStorage.getItem('gugudan_stamps');
-  if (savedStamps) {
-    try {
-      state.stamps = JSON.parse(savedStamps) || [];
-    } catch (e) {
-      state.stamps = [];
+  // [사용자 요청 반영] 테스트 기록 전체 리셋 및 스탬프 8개 원복 1회 자동 마이그레이션
+  const RESET_TEST_FLAG = 'gugudan_reset_records_stamps_v2';
+  if (!localStorage.getItem(RESET_TEST_FLAG)) {
+    localStorage.removeItem('gugudan_time_records');
+    state.records = {};
+
+    state.stamps = [
+      { type: 'gold', title: '100점 만점', date: '구구단 달인' },
+      { type: 'normal', title: '참 잘했어요', date: '2단 완주' },
+      { type: 'normal', title: '아주 훌륭해요', date: '3단 완주' },
+      { type: 'gold', title: '100점 만점', date: '4단 완주' },
+      { type: 'normal', title: '참 잘했어요', date: '5단 완주' },
+      { type: 'normal', title: '우수 훈련', date: '순간 반응' },
+      { type: 'gold', title: '참 잘했어요', date: '거꾸로 도전' },
+      { type: 'normal', title: '아주 훌륭해요', date: '구구단 탐정' }
+    ];
+    localStorage.setItem('gugudan_stamps', JSON.stringify(state.stamps));
+    localStorage.setItem(RESET_TEST_FLAG, 'true');
+  } else {
+    const savedStamps = localStorage.getItem('gugudan_stamps');
+    if (savedStamps) {
+      try {
+        state.stamps = JSON.parse(savedStamps) || [];
+      } catch (e) {
+        state.stamps = [];
+      }
+    }
+
+    const savedRecords = localStorage.getItem('gugudan_time_records');
+    if (savedRecords) {
+      try {
+        state.records = JSON.parse(savedRecords) || {};
+      } catch (e) {
+        state.records = {};
+      }
     }
   }
 
@@ -300,15 +329,6 @@ function loadSavedData() {
       } catch (e) {
         state.wrongProblems = [];
       }
-    }
-  }
-
-  const savedRecords = localStorage.getItem('gugudan_time_records');
-  if (savedRecords) {
-    try {
-      state.records = JSON.parse(savedRecords) || {};
-    } catch (e) {
-      state.records = {};
     }
   }
 
@@ -1932,4 +1952,15 @@ function renderRankingModalList(key, title) {
   }
   html += '</div>';
   top5Container.innerHTML = html;
+}
+
+function resetAllTimeRecords() {
+  if (confirm('모든 단수와 모드의 시간 기록(Top 5)을 전부 초기화할까요?')) {
+    state.records = {};
+    localStorage.removeItem('gugudan_time_records');
+    renderRankingModalContent();
+    updateHomeBestTags();
+    if (typeof updateRhythmRankPanel === 'function') updateRhythmRankPanel();
+    alert('모든 시간 기록이 깨끗하게 초기화되었습니다! ✨');
+  }
 }

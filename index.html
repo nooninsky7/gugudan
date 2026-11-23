@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=3.0">
+  <link rel="stylesheet" href="style.css?v=3.1">
 </head>
 <body>
   <div id="app">
@@ -478,6 +478,11 @@
 
         <!-- Top 5 랭킹 보드 목록 -->
         <div class="ranking-top5-container" id="ranking-top5-container"></div>
+
+        <!-- 하단 시간 기록 초기화 버튼 -->
+        <div style="margin-top: 18px; text-align: center; border-top: 1px dashed #e2e8f0; padding-top: 14px;">
+          <button type="button" class="btn-ghost" style="font-size: 0.88rem; color: #94a3b8; border: 1px solid #cbd5e1; border-radius: 999px; padding: 6px 16px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.color='#ef4444';this.style.borderColor='#fca5a5'" onmouseout="this.style.color='#94a3b8';this.style.borderColor='#cbd5e1'" onclick="resetAllTimeRecords()">🗑️ 시간 기록 전체 초기화</button>
+        </div>
       </div>
     </div>
 
@@ -485,6 +490,6 @@
     <canvas id="confetti-canvas"></canvas>
   </div>
 
-  <script src="app.js?v=3.0"></script>
+  <script src="app.js?v=3.1"></script>
 </body>
 </html>
