@@ -2633,3 +2633,84 @@ function finishSubtractionGame() {
   const rankCard = document.getElementById('result-top5-card');
   if (rankCard) rankCard.style.display = 'none';
 }
+
+// ========================================================
+// --- 14. 성장 레벨 (계급표) 모달 시스템 ---
+// ========================================================
+function showLevelGuideModal() {
+  sounds.playBeep(600, 0.05);
+  const modal = document.getElementById('level-modal');
+  if (modal) modal.classList.add('open');
+
+  for (let i = 0; i < LEVELS.length; i++) {
+    const row = document.getElementById(`lvl-row-${i}`);
+    if (row) {
+      if (state.stars >= LEVELS[i].stars) {
+        row.classList.add('achieved');
+      } else {
+        row.classList.remove('achieved');
+      }
+      const isNext = (i < LEVELS.length - 1 && state.stars >= LEVELS[i].stars && state.stars < LEVELS[i + 1].stars);
+      const isMax = (i === LEVELS.length - 1 && state.stars >= LEVELS[i].stars);
+      if (isNext || isMax) {
+        row.classList.add('current');
+      } else {
+        row.classList.remove('current');
+      }
+    }
+  }
+}
+
+function closeLevelModal(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close-btn') && !e.target.classList.contains('action-btn')) return;
+  sounds.playBeep(450, 0.05);
+  const modal = document.getElementById('level-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+// ========================================================
+// --- 15. 전체화면 모드 (상단 웹툴바 숨기기) ---
+// ========================================================
+function toggleFullscreen() {
+  sounds.playBeep(520, 0.04);
+  const docEl = document.documentElement;
+  const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+
+  if (!isFs) {
+    if (docEl.requestFullscreen) {
+      docEl.requestFullscreen().catch(() => {});
+    } else if (docEl.webkitRequestFullscreen) {
+      docEl.webkitRequestFullscreen();
+    } else if (docEl.mozRequestFullScreen) {
+      docEl.mozRequestFullScreen();
+    } else if (docEl.msRequestFullscreen) {
+      docEl.msRequestFullscreen();
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  }
+}
+
+function updateFullscreenBtn() {
+  const btn = document.getElementById('btn-fullscreen-toggle');
+  if (!btn) return;
+  const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+  if (isFs) {
+    btn.innerHTML = '🗗 <span>창모드</span>';
+    btn.classList.add('is-active');
+  } else {
+    btn.innerHTML = '⛶ <span>전체화면</span>';
+    btn.classList.remove('is-active');
+  }
+}
+
+document.addEventListener('fullscreenchange', updateFullscreenBtn);
+document.addEventListener('webkitfullscreenchange', updateFullscreenBtn);

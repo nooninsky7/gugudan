@@ -108,6 +108,8 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+  flex-shrink: 0;
+  z-index: 10;
 }
 
 .character-badge {
@@ -168,7 +170,26 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
+
+.btn-home-nav {
+  background: #E0F2FE;
+  border: 2px solid #38BDF8;
+  color: #0369A1;
+  padding: 8px 14px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.1s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.btn-home-nav:active { transform: scale(0.95); }
 
 .btn-stampbook-open {
   background: #FFF8E1;
@@ -185,6 +206,21 @@ body {
 }
 .btn-stampbook-open:active { transform: scale(0.95); }
 
+.btn-hall-open {
+  background: #FEF3C7;
+  border: 2px solid #F59E0B;
+  color: #B45309;
+  padding: 8px 14px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.1s;
+}
+.btn-hall-open:active { transform: scale(0.95); }
+
 .btn-coupon-open {
   background: #F3E5F5;
   border: 2px solid #AB47BC;
@@ -200,12 +236,35 @@ body {
 }
 .btn-coupon-open:active { transform: scale(0.95); }
 
+.btn-fullscreen-toggle {
+  background: #F1F5F9;
+  border: 2px solid #94A3B8;
+  color: #1E293B;
+  padding: 8px 14px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.1s, background 0.15s, border-color 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.btn-fullscreen-toggle:active { transform: scale(0.95); }
+.btn-fullscreen-toggle.is-active {
+  background: #EFF6FF;
+  border-color: #3B82F6;
+  color: #1D4ED8;
+}
+
 .sound-toggle-btn {
   background: white;
   border: none;
   font-size: 22px;
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -1318,18 +1377,60 @@ body {
 }
 
 /* ================= 3. 결과 화면 & 스탬프 ================= */
+#screen-result {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px 0 40px;
+}
+
 .result-card {
   background: white;
   border-radius: var(--radius-lg);
-  padding: 30px 36px;
+  padding: 24px 28px;
   text-align: center;
   box-shadow: var(--shadow-soft);
-  max-width: 600px;
+  max-width: 620px;
   width: 100%;
-  margin: auto;
+  margin: 10px auto 30px;
   position: relative;
-  overflow: hidden;
 }
+
+.result-top-shortcuts {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px dashed #E2E8F0;
+  padding-bottom: 14px;
+}
+
+.btn-top-home {
+  background: #E0F2FE;
+  border: 2px solid #38BDF8;
+  color: #0369A1;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.btn-top-home:active { transform: scale(0.95); }
+
+.btn-top-retry {
+  background: #FEF3C7;
+  border: 2px solid #F59E0B;
+  color: #B45309;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.btn-top-retry:active { transform: scale(0.95); }
 
 .stamp-seal {
   position: absolute;
@@ -2638,6 +2739,119 @@ body {
   }
 }
 
+/* ================= 전체화면 모드 최적화 ================= */
+:fullscreen #app,
+:-webkit-full-screen #app {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  border-radius: 0;
+  border: none;
+  padding: 10px 18px;
+}
+
+@media (max-width: 1024px) {
+  .app-header {
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .character-badge {
+    padding: 4px 10px;
+    gap: 8px;
+  }
+  .main-title {
+    font-size: 19px;
+  }
+  .sub-title {
+    display: none;
+  }
+  .header-right {
+    gap: 5px;
+  }
+  .header-right button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
+
+/* ================= 10. 성장 레벨 (계급표) 모달 스타일 ================= */
+.modal-level-card {
+  max-width: 600px;
+  width: 95%;
+  max-height: 88vh;
+  overflow-y: auto;
+}
+.level-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0;
+}
+.level-item-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #F8FAFC;
+  border: 2px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 12px 18px;
+  transition: all 0.2s ease;
+}
+.level-item-row.achieved {
+  background: #F0FDF4;
+  border-color: #86EFAC;
+}
+.level-item-row.current {
+  border-color: #F59E0B;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+}
+.level-item-row.highlight {
+  background: #FFFBEB;
+  border-color: #FCD34D;
+}
+.level-item-row.highlight.achieved {
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  border-color: #F59E0B;
+}
+.lvl-avatar {
+  font-size: 2.2rem;
+  min-width: 44px;
+  text-align: center;
+}
+.lvl-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.lvl-info strong {
+  font-size: 1.05rem;
+  color: #1E293B;
+}
+.lvl-info span {
+  font-size: 0.82rem;
+  color: #64748B;
+}
+.lvl-badge {
+  font-size: 0.8rem;
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #E2E8F0;
+  color: #475569;
+  white-space: nowrap;
+}
+.level-item-row.achieved .lvl-badge {
+  background: #DCFCE7;
+  color: #166534;
+}
+.lvl-badge.gold {
+  background: #FEF08A;
+  color: #854D0E;
+}
+
 </style>
 </head>
 <body>
@@ -2647,35 +2861,39 @@ body {
     <div class="bg-bubble b2"></div>
     <div class="bg-bubble b3"></div>
 
+    <!-- 모든 화면 상단 고정 헤더 -->
+    <header class="app-header" id="common-app-header">
+      <div class="character-badge" onclick="showLevelGuideModal()" style="cursor: pointer;" title="내 성장 레벨 (클릭 시 계급표 보기)">
+        <span class="character-icon" id="user-avatar">🐥</span>
+        <div class="user-info">
+          <span class="user-level" id="user-title">구구단 새싹</span>
+          <span class="user-score">⭐ <span id="total-stars">0</span>개 모음</span>
+        </div>
+      </div>
+
+      <div class="header-center" onclick="goHome()" style="cursor: pointer;" title="첫화면(홈)으로 이동">
+        <h1 class="main-title">신나는 구구단 탐험대 🚀</h1>
+        <p class="sub-title">순간적으로 팡! 거꾸로도 척척!</p>
+      </div>
+
+      <div class="header-right">
+        <button class="btn-home-nav" onclick="goHome()" title="첫화면(홈)으로 이동">🏠 홈</button>
+        <button class="btn-stampbook-open" onclick="openStampModal()" title="내 칭찬 도장판 보기">
+          💮 도장판 <span id="header-stamp-count">(0/20)</span>
+        </button>
+        <button class="btn-hall-open" onclick="openRankingModal()" title="명예의 전당 Top 5 랭킹">
+          🏆 명예의 전당
+        </button>
+        <button class="btn-coupon-open" onclick="openCouponModal()" title="부모님 보상 쿠폰함">
+          🎁 쿠폰함
+        </button>
+        <button class="sound-toggle-btn" id="btn-sound-toggle" title="소리 켜기/끄기">🔊</button>
+        <button class="btn-fullscreen-toggle" id="btn-fullscreen-toggle" onclick="toggleFullscreen()" title="전체화면 (상단 웹툴바 숨기기)">⛶ 전체화면</button>
+      </div>
+    </header>
+
     <!-- ================= 1. 메인 화면 (홈) ================= -->
     <section id="screen-home" class="screen active">
-      <header class="app-header">
-        <div class="character-badge">
-          <span class="character-icon" id="user-avatar">🐥</span>
-          <div class="user-info">
-            <span class="user-level" id="user-title">구구단 새싹</span>
-            <span class="user-score">⭐ <span id="total-stars">0</span>개 모음</span>
-          </div>
-        </div>
-
-        <div class="header-center">
-          <h1 class="main-title">신나는 구구단 탐험대 🚀</h1>
-          <p class="sub-title">순간적으로 팡! 거꾸로도 척척!</p>
-        </div>
-
-        <div class="header-right">
-          <button class="btn-stampbook-open" onclick="openStampModal()" title="내 칭찬 도장판 보기">
-            💮 도장판 <span id="header-stamp-count">(0/20)</span>
-          </button>
-          <button class="btn-hall-open" onclick="openRankingModal()" title="명예의 전당 Top 5 랭킹">
-            🏆 명예의 전당
-          </button>
-          <button class="btn-coupon-open" onclick="openCouponModal()" title="부모님 보상 쿠폰함">
-            🎁 쿠폰함
-          </button>
-          <button class="sound-toggle-btn" id="btn-sound-toggle" title="소리 켜기/끄기">🔊</button>
-        </div>
-      </header>
 
       <!-- 단 선택 필터 바 -->
       <div class="dan-selector-card">
@@ -3079,6 +3297,12 @@ body {
     <!-- ================= 4. 결과 화면 & 스탬프 ================= -->
     <section id="screen-result" class="screen">
       <div class="result-card">
+        <!-- 상단 빠른 홈/재도전 바로가기 바 -->
+        <div class="result-top-shortcuts">
+          <button type="button" class="btn-top-home" onclick="goHome()">🏠 첫화면으로 가기</button>
+          <button type="button" class="btn-top-retry" onclick="restartCurrentGame()">🔄 한 번 더 하기</button>
+        </div>
+
         <!-- 쾅! 찍히는 칭찬 스탬프 애니메이션 영역 -->
         <div class="stamp-seal" id="result-stamp">
           <div class="stamp-inner" id="result-stamp-inner">
@@ -3220,6 +3444,66 @@ body {
         <button class="action-btn btn-retry" onclick="closeRewardModal()" style="margin-top: 14px; width: 100%;">
           고마워요! 신나요! 💖
         </button>
+      </div>
+    </div>
+
+    <!-- ================= 7-1. 성장 레벨 (계급표) 모달 ================= -->
+    <div class="modal-overlay" id="level-modal" onclick="closeLevelModal(event)">
+      <div class="modal-card modal-level-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2>⭐ 구구단 탐험대 레벨 계급표</h2>
+          <button class="modal-close-btn" onclick="closeLevelModal()">✕</button>
+        </div>
+        <p class="modal-subtitle">문제를 맞히고 훈련을 마칠 때마다 별(⭐)이 쌓여서 새로운 동물과 계급으로 진화해요!</p>
+
+        <div class="level-list-container">
+          <div class="level-item-row" id="lvl-row-0">
+            <span class="lvl-avatar">🐥</span>
+            <div class="lvl-info">
+              <strong>1단계: 구구단 새싹 🌱</strong>
+              <span>별 0개부터 시작하는 귀여운 탐험대원!</span>
+            </div>
+            <span class="lvl-badge">기본</span>
+          </div>
+          <div class="level-item-row" id="lvl-row-1">
+            <span class="lvl-avatar">🐰</span>
+            <div class="lvl-info">
+              <strong>2단계: 구구단 탐험가 🎒</strong>
+              <span>별 20개 달성! 깡충깡충 실력이 쑥쑥 늘어나는 중!</span>
+            </div>
+            <span class="lvl-badge">⭐ 20개</span>
+          </div>
+          <div class="level-item-row" id="lvl-row-2">
+            <span class="lvl-avatar">🦊</span>
+            <div class="lvl-info">
+              <strong>3단계: 구구단 닌자 ⚔️</strong>
+              <span>별 50개 달성! 번개처럼 날렵하게 답을 척척 맞혀요!</span>
+            </div>
+            <span class="lvl-badge">⭐ 50개</span>
+          </div>
+          <div class="level-item-row" id="lvl-row-3">
+            <span class="lvl-avatar">🦁</span>
+            <div class="lvl-info">
+              <strong>4단계: 구구단 마법사 🧙‍♂️</strong>
+              <span>별 100개 달성! 구구단과 0 뺄셈을 마법처럼 자유자재로!</span>
+            </div>
+            <span class="lvl-badge">⭐ 100개</span>
+          </div>
+          <div class="level-item-row highlight" id="lvl-row-4">
+            <span class="lvl-avatar">🐲</span>
+            <div class="lvl-info">
+              <strong>5단계: 구구단 드래곤 마스터 👑</strong>
+              <span>별 200개 달성! 모든 구구단을 완벽히 지배하는 최강 끝판왕!</span>
+            </div>
+            <span class="lvl-badge gold">⭐ 200개 (최고 계급)</span>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="text-align: center; margin-top: 14px;">
+          <button type="button" class="action-btn btn-retry" onclick="closeLevelModal()" style="width: 100%; border-radius: 999px;">
+            멋져요! 계속 도전하기 🚀
+          </button>
+        </div>
       </div>
     </div>
 
@@ -5894,6 +6178,87 @@ function finishSubtractionGame() {
   const rankCard = document.getElementById('result-top5-card');
   if (rankCard) rankCard.style.display = 'none';
 }
+
+// ========================================================
+// --- 14. 성장 레벨 (계급표) 모달 시스템 ---
+// ========================================================
+function showLevelGuideModal() {
+  sounds.playBeep(600, 0.05);
+  const modal = document.getElementById('level-modal');
+  if (modal) modal.classList.add('open');
+
+  for (let i = 0; i < LEVELS.length; i++) {
+    const row = document.getElementById(`lvl-row-${i}`);
+    if (row) {
+      if (state.stars >= LEVELS[i].stars) {
+        row.classList.add('achieved');
+      } else {
+        row.classList.remove('achieved');
+      }
+      const isNext = (i < LEVELS.length - 1 && state.stars >= LEVELS[i].stars && state.stars < LEVELS[i + 1].stars);
+      const isMax = (i === LEVELS.length - 1 && state.stars >= LEVELS[i].stars);
+      if (isNext || isMax) {
+        row.classList.add('current');
+      } else {
+        row.classList.remove('current');
+      }
+    }
+  }
+}
+
+function closeLevelModal(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close-btn') && !e.target.classList.contains('action-btn')) return;
+  sounds.playBeep(450, 0.05);
+  const modal = document.getElementById('level-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+// ========================================================
+// --- 15. 전체화면 모드 (상단 웹툴바 숨기기) ---
+// ========================================================
+function toggleFullscreen() {
+  sounds.playBeep(520, 0.04);
+  const docEl = document.documentElement;
+  const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+
+  if (!isFs) {
+    if (docEl.requestFullscreen) {
+      docEl.requestFullscreen().catch(() => {});
+    } else if (docEl.webkitRequestFullscreen) {
+      docEl.webkitRequestFullscreen();
+    } else if (docEl.mozRequestFullScreen) {
+      docEl.mozRequestFullScreen();
+    } else if (docEl.msRequestFullscreen) {
+      docEl.msRequestFullscreen();
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  }
+}
+
+function updateFullscreenBtn() {
+  const btn = document.getElementById('btn-fullscreen-toggle');
+  if (!btn) return;
+  const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+  if (isFs) {
+    btn.innerHTML = '🗗 <span>창모드</span>';
+    btn.classList.add('is-active');
+  } else {
+    btn.innerHTML = '⛶ <span>전체화면</span>';
+    btn.classList.remove('is-active');
+  }
+}
+
+document.addEventListener('fullscreenchange', updateFullscreenBtn);
+document.addEventListener('webkitfullscreenchange', updateFullscreenBtn);
 
 </script>
 </body>

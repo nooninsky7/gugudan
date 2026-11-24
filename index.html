@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=3.5">
+  <link rel="stylesheet" href="style.css?v=3.6">
 </head>
 <body>
   <div id="app">
@@ -19,35 +19,39 @@
     <div class="bg-bubble b2"></div>
     <div class="bg-bubble b3"></div>
 
+    <!-- 모든 화면 상단 고정 헤더 -->
+    <header class="app-header" id="common-app-header">
+      <div class="character-badge" onclick="showLevelGuideModal()" style="cursor: pointer;" title="내 성장 레벨 (클릭 시 계급표 보기)">
+        <span class="character-icon" id="user-avatar">🐥</span>
+        <div class="user-info">
+          <span class="user-level" id="user-title">구구단 새싹</span>
+          <span class="user-score">⭐ <span id="total-stars">0</span>개 모음</span>
+        </div>
+      </div>
+
+      <div class="header-center" onclick="goHome()" style="cursor: pointer;" title="첫화면(홈)으로 이동">
+        <h1 class="main-title">신나는 구구단 탐험대 🚀</h1>
+        <p class="sub-title">순간적으로 팡! 거꾸로도 척척!</p>
+      </div>
+
+      <div class="header-right">
+        <button class="btn-home-nav" onclick="goHome()" title="첫화면(홈)으로 이동">🏠 홈</button>
+        <button class="btn-stampbook-open" onclick="openStampModal()" title="내 칭찬 도장판 보기">
+          💮 도장판 <span id="header-stamp-count">(0/20)</span>
+        </button>
+        <button class="btn-hall-open" onclick="openRankingModal()" title="명예의 전당 Top 5 랭킹">
+          🏆 명예의 전당
+        </button>
+        <button class="btn-coupon-open" onclick="openCouponModal()" title="부모님 보상 쿠폰함">
+          🎁 쿠폰함
+        </button>
+        <button class="sound-toggle-btn" id="btn-sound-toggle" title="소리 켜기/끄기">🔊</button>
+        <button class="btn-fullscreen-toggle" id="btn-fullscreen-toggle" onclick="toggleFullscreen()" title="전체화면 (상단 웹툴바 숨기기)">⛶ 전체화면</button>
+      </div>
+    </header>
+
     <!-- ================= 1. 메인 화면 (홈) ================= -->
     <section id="screen-home" class="screen active">
-      <header class="app-header">
-        <div class="character-badge">
-          <span class="character-icon" id="user-avatar">🐥</span>
-          <div class="user-info">
-            <span class="user-level" id="user-title">구구단 새싹</span>
-            <span class="user-score">⭐ <span id="total-stars">0</span>개 모음</span>
-          </div>
-        </div>
-
-        <div class="header-center">
-          <h1 class="main-title">신나는 구구단 탐험대 🚀</h1>
-          <p class="sub-title">순간적으로 팡! 거꾸로도 척척!</p>
-        </div>
-
-        <div class="header-right">
-          <button class="btn-stampbook-open" onclick="openStampModal()" title="내 칭찬 도장판 보기">
-            💮 도장판 <span id="header-stamp-count">(0/20)</span>
-          </button>
-          <button class="btn-hall-open" onclick="openRankingModal()" title="명예의 전당 Top 5 랭킹">
-            🏆 명예의 전당
-          </button>
-          <button class="btn-coupon-open" onclick="openCouponModal()" title="부모님 보상 쿠폰함">
-            🎁 쿠폰함
-          </button>
-          <button class="sound-toggle-btn" id="btn-sound-toggle" title="소리 켜기/끄기">🔊</button>
-        </div>
-      </header>
 
       <!-- 단 선택 필터 바 -->
       <div class="dan-selector-card">
@@ -451,6 +455,12 @@
     <!-- ================= 4. 결과 화면 & 스탬프 ================= -->
     <section id="screen-result" class="screen">
       <div class="result-card">
+        <!-- 상단 빠른 홈/재도전 바로가기 바 -->
+        <div class="result-top-shortcuts">
+          <button type="button" class="btn-top-home" onclick="goHome()">🏠 첫화면으로 가기</button>
+          <button type="button" class="btn-top-retry" onclick="restartCurrentGame()">🔄 한 번 더 하기</button>
+        </div>
+
         <!-- 쾅! 찍히는 칭찬 스탬프 애니메이션 영역 -->
         <div class="stamp-seal" id="result-stamp">
           <div class="stamp-inner" id="result-stamp-inner">
@@ -595,6 +605,66 @@
       </div>
     </div>
 
+    <!-- ================= 7-1. 성장 레벨 (계급표) 모달 ================= -->
+    <div class="modal-overlay" id="level-modal" onclick="closeLevelModal(event)">
+      <div class="modal-card modal-level-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2>⭐ 구구단 탐험대 레벨 계급표</h2>
+          <button class="modal-close-btn" onclick="closeLevelModal()">✕</button>
+        </div>
+        <p class="modal-subtitle">문제를 맞히고 훈련을 마칠 때마다 별(⭐)이 쌓여서 새로운 동물과 계급으로 진화해요!</p>
+
+        <div class="level-list-container">
+          <div class="level-item-row" id="lvl-row-0">
+            <span class="lvl-avatar">🐥</span>
+            <div class="lvl-info">
+              <strong>1단계: 구구단 새싹 🌱</strong>
+              <span>별 0개부터 시작하는 귀여운 탐험대원!</span>
+            </div>
+            <span class="lvl-badge">기본</span>
+          </div>
+          <div class="level-item-row" id="lvl-row-1">
+            <span class="lvl-avatar">🐰</span>
+            <div class="lvl-info">
+              <strong>2단계: 구구단 탐험가 🎒</strong>
+              <span>별 20개 달성! 깡충깡충 실력이 쑥쑥 늘어나는 중!</span>
+            </div>
+            <span class="lvl-badge">⭐ 20개</span>
+          </div>
+          <div class="level-item-row" id="lvl-row-2">
+            <span class="lvl-avatar">🦊</span>
+            <div class="lvl-info">
+              <strong>3단계: 구구단 닌자 ⚔️</strong>
+              <span>별 50개 달성! 번개처럼 날렵하게 답을 척척 맞혀요!</span>
+            </div>
+            <span class="lvl-badge">⭐ 50개</span>
+          </div>
+          <div class="level-item-row" id="lvl-row-3">
+            <span class="lvl-avatar">🦁</span>
+            <div class="lvl-info">
+              <strong>4단계: 구구단 마법사 🧙‍♂️</strong>
+              <span>별 100개 달성! 구구단과 0 뺄셈을 마법처럼 자유자재로!</span>
+            </div>
+            <span class="lvl-badge">⭐ 100개</span>
+          </div>
+          <div class="level-item-row highlight" id="lvl-row-4">
+            <span class="lvl-avatar">🐲</span>
+            <div class="lvl-info">
+              <strong>5단계: 구구단 드래곤 마스터 👑</strong>
+              <span>별 200개 달성! 모든 구구단을 완벽히 지배하는 최강 끝판왕!</span>
+            </div>
+            <span class="lvl-badge gold">⭐ 200개 (최고 계급)</span>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="text-align: center; margin-top: 14px;">
+          <button type="button" class="action-btn btn-retry" onclick="closeLevelModal()" style="width: 100%; border-radius: 999px;">
+            멋져요! 계속 도전하기 🚀
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- ================= 8. 명예의 전당 (Top 5 랭킹) 모달 ================= -->
     <div class="modal-overlay" id="ranking-modal" onclick="closeRankingModal(event)">
       <div class="modal-card modal-ranking-card" onclick="event.stopPropagation()">
@@ -630,6 +700,6 @@
     <canvas id="confetti-canvas"></canvas>
   </div>
 
-  <script src="app.js?v=3.5"></script>
+  <script src="app.js?v=3.6"></script>
 </body>
 </html>
