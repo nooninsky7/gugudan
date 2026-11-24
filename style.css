@@ -2412,7 +2412,19 @@ body {
 
 .answer-row .digit-box.answer-box.active-focus {
   border-color: #f59e0b;
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.35);
+  animation: pulseAnswerFocus 1.2s infinite alternate;
+}
+
+@keyframes pulseAnswerFocus {
+  from { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25); }
+  to { border-color: #d97706; box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.5); }
+}
+
+.answer-row .digit-box.empty-cell {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .answer-row .digit-box.answer-box.filled {
