@@ -371,12 +371,12 @@ function updateStampProgressUI() {
     else rhythmEl.classList.remove('almost');
   }
 
-  // 2. 마법의 0 뺄셈 특훈 (목표 3세트 완료)
+  // 2. 마법의 0 뺄셈 특훈 (목표 2세트 완료)
   const subEl = document.getElementById('home-stamp-subtraction');
   if (subEl) {
     const cur = p.subtraction || 0;
-    subEl.textContent = `💮 도장까지 ${cur}/3세트`;
-    if (cur >= 2) subEl.classList.add('almost');
+    subEl.textContent = `💮 도장까지 ${cur}/2세트`;
+    if (cur >= 1) subEl.classList.add('almost');
     else subEl.classList.remove('almost');
   }
 
@@ -402,7 +402,7 @@ function renderStampProgressDashboard() {
 
   const items = [
     { name: '🎶 리듬 외우기', cur: p.rhythm || 0, max: 4, unit: '세트' },
-    { name: '🪄 0 뺄셈 특훈', cur: p.subtraction || 0, max: 3, unit: '세트' },
+    { name: '🪄 0 뺄셈 특훈', cur: p.subtraction || 0, max: 2, unit: '세트' },
     { name: '⚡ 순간 반응', cur: p.speed || 0, max: 3, unit: '세트' },
     { name: '🔄 거꾸로 도전', cur: p.reverse || 0, max: 3, unit: '세트' },
     { name: '🕵️ 구구 탐정', cur: p.missing || 0, max: 3, unit: '세트' },
@@ -2576,7 +2576,7 @@ function finishSubtractionGame() {
   let isEarnedBoardStamp = false;
 
   let stampProgressMsg = '';
-  if (subCount >= 3) {
+  if (subCount >= 2) {
     isEarnedBoardStamp = true;
     state.stampProgress.subtraction = 0;
     state.stamps.push({
@@ -2584,9 +2584,9 @@ function finishSubtractionGame() {
       title: '0 뺄셈 특훈 완주',
       date: new Date().toLocaleDateString('ko-KR')
     });
-    stampProgressMsg = '🎉 <strong>0 뺄셈 특훈 3세트 완주 대성공!</strong> 도장판에 도장이 쾅 찍혔어요! 💮';
+    stampProgressMsg = '🎉 <strong>0 뺄셈 특훈 2세트 완주 대성공!</strong> 도장판에 도장이 쾅 찍혔어요! 💮';
   } else {
-    stampProgressMsg = `💮 도장판 도장까지: <strong>${subCount} / 3세트 완료</strong> (앞으로 ${3 - subCount}세트 더 풀면 도장 쾅!)`;
+    stampProgressMsg = `💮 도장판 도장까지: <strong>${subCount} / 2세트 완료</strong> (앞으로 ${2 - subCount}세트 더 풀면 도장 쾅!)`;
   }
 
   saveUserData();
@@ -2614,7 +2614,7 @@ function finishSubtractionGame() {
   if (bannerEl) bannerEl.innerHTML = stampProgressMsg;
 
   // 결과 화면 칭찬 도장 적용
-  const stampSub = isEarnedBoardStamp ? '3세트 완주 💮' : `${subCount}/3세트 달성`;
+  const stampSub = isEarnedBoardStamp ? '2세트 완주 💮' : `${subCount}/2세트 달성`;
   applyStampToResult('gold', '0 뺄셈 마스터', stampSub, isEarnedBoardStamp);
 
   // 랭킹 보드 숨기기 (구구단 전용 랭킹이므로)
