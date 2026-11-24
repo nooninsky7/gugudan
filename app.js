@@ -219,12 +219,14 @@ const state = {
     speed: 0,
     reverse: 0,
     missing: 0,
-    order: 0
+    order: 0,
+    subtraction: 0
   },
   rewardCoupon: '맛있는 아이스크림 먹기 🍦',
   selectedDans: [2, 3, 4, 5, 6, 7, 8, 9],
   wrongProblems: [],
   records: {}, // 모드/단수별 1~5위 시간 기록 보관함
+  lastCompletedMode: 'speed',
   currentGame: {
     mode: 'speed', // 'speed', 'reverse', 'missing', 'order', 'review'
     questions: [],
@@ -342,12 +344,12 @@ function loadSavedData() {
   const savedStampProgress = localStorage.getItem('gugudan_stamp_progress');
   if (savedStampProgress) {
     try {
-      state.stampProgress = Object.assign({ rhythm: 0, speed: 0, reverse: 0, missing: 0, order: 0 }, JSON.parse(savedStampProgress));
+      state.stampProgress = Object.assign({ rhythm: 0, speed: 0, reverse: 0, missing: 0, order: 0, subtraction: 0 }, JSON.parse(savedStampProgress));
     } catch (e) {
-      state.stampProgress = { rhythm: 0, speed: 0, reverse: 0, missing: 0, order: 0 };
+      state.stampProgress = { rhythm: 0, speed: 0, reverse: 0, missing: 0, order: 0, subtraction: 0 };
     }
   } else {
-    state.stampProgress = { rhythm: 0, speed: 0, reverse: 0, missing: 0, order: 0 };
+    state.stampProgress = { rhythm: 0, speed: 0, reverse: 0, missing: 0, order: 0, subtraction: 0 };
   }
 
   updateUserBadge();
@@ -358,7 +360,7 @@ function loadSavedData() {
 }
 
 function updateStampProgressUI() {
-  const p = state.stampProgress || { rhythm: 0, speed: 0, reverse: 0, missing: 0, order: 0 };
+  const p = state.stampProgress || { rhythm: 0, speed: 0, reverse: 0, missing: 0, order: 0, subtraction: 0 };
 
   // 1. 리듬 구구단 (목표 4세트 완주)
   const rhythmEl = document.getElementById('home-stamp-rhythm');
@@ -369,7 +371,16 @@ function updateStampProgressUI() {
     else rhythmEl.classList.remove('almost');
   }
 
-  // 2. 하단 4개 항목 (목표 3세트 완료)
+  // 2. 마법의 0 뺄셈 특훈 (목표 3세트 완료)
+  const subEl = document.getElementById('home-stamp-subtraction');
+  if (subEl) {
+    const cur = p.subtraction || 0;
+    subEl.textContent = `💮 도장까지 ${cur}/3세트`;
+    if (cur >= 2) subEl.classList.add('almost');
+    else subEl.classList.remove('almost');
+  }
+
+  // 3. 하단 4개 항목 (목표 3세트 완료)
   const modes = ['speed', 'reverse', 'missing', 'order'];
   modes.forEach(m => {
     const el = document.getElementById(`home-stamp-${m}`);
@@ -387,10 +398,11 @@ function updateStampProgressUI() {
 function renderStampProgressDashboard() {
   const dash = document.getElementById('stamp-progress-dashboard');
   if (!dash) return;
-  const p = state.stampProgress || { rhythm: 0, speed: 0, reverse: 0, missing: 0, order: 0 };
+  const p = state.stampProgress || { rhythm: 0, speed: 0, reverse: 0, missing: 0, order: 0, subtraction: 0 };
 
   const items = [
     { name: '🎶 리듬 외우기', cur: p.rhythm || 0, max: 4, unit: '세트' },
+    { name: '🪄 0 뺄셈 특훈', cur: p.subtraction || 0, max: 3, unit: '세트' },
     { name: '⚡ 순간 반응', cur: p.speed || 0, max: 3, unit: '세트' },
     { name: '🔄 거꾸로 도전', cur: p.reverse || 0, max: 3, unit: '세트' },
     { name: '🕵️ 구구 탐정', cur: p.missing || 0, max: 3, unit: '세트' },
@@ -1115,14 +1127,24 @@ function removeProblemFromWrongList(num1, num2) {
 function setupKeyboardListener() {
   window.addEventListener('keydown', (e) => {
     const activeScreen = document.querySelector('.screen.active');
-    if (!activeScreen || activeScreen.id !== 'screen-game') return;
+    if (!activeScreen) return;
 
-    if (e.key >= '0' && e.key <= '9') {
-      pressKey(parseInt(e.key, 10));
-    } else if (e.key === 'Backspace' || e.key === 'Delete') {
-      pressKey('clear');
-    } else if (e.key === 'Enter' || e.key === ' ') {
-      submitAnswer();
+    if (activeScreen.id === 'screen-game') {
+      if (e.key >= '0' && e.key <= '9') {
+        pressKey(parseInt(e.key, 10));
+      } else if (e.key === 'Backspace' || e.key === 'Delete') {
+        pressKey('clear');
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        submitAnswer();
+      }
+    } else if (activeScreen.id === 'screen-subtraction') {
+      if (e.key >= '0' && e.key <= '9') {
+        pressSubKey(parseInt(e.key, 10));
+      } else if (e.key === 'Backspace' || e.key === 'Delete') {
+        pressSubKey('clear');
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        submitSubAnswer();
+      }
     }
   });
 }
@@ -1138,6 +1160,10 @@ function finishGame() {
   const recordKey = `quiz_${g.mode}_${danKey}`;
   const recResult = saveRecord(recordKey, elapsedSec);
   updateHomeBestTags();
+  state.lastCompletedMode = g.mode;
+
+  const rankCard = document.getElementById('result-top5-card');
+  if (rankCard) rankCard.style.display = 'block';
 
   switchScreen('screen-result');
 
@@ -1402,7 +1428,11 @@ function closeRewardModal(e) {
 }
 
 function restartCurrentGame() {
-  startGame(state.currentGame.mode);
+  if (state.lastCompletedMode === 'subtraction') {
+    startSubtractionGame(subState.level);
+  } else {
+    startGame(state.currentGame.mode);
+  }
 }
 
 function goHome() {
@@ -2089,4 +2119,505 @@ function resetAllTimeRecords() {
     if (typeof updateRhythmRankPanel === 'function') updateRhythmRankPanel();
     alert('모든 시간 기록이 깨끗하게 초기화되었습니다! ✨');
   }
+}
+
+// =========================================================================
+// --- 13. 마법의 0 뺄셈 특훈 시스템 (가운데 0 받아내림 마스터) ---
+// =========================================================================
+
+const subState = {
+  level: 2, // 1: 100의 마법, 2: 가운데 0 변신, 3: 연속 0 끝판왕, 4: 실전 10문제
+  questions: [],
+  currentIndex: 0,
+  currentInput: '',
+  isHintActive: true, // 기본으로 힌트 활성화되어 아이에게 원리를 시각화
+  correctCount: 0,
+  startTime: 0,
+  isProcessing: false
+};
+
+// 1. 화면 진입 및 단계 선택
+function openSubtractionScreen(level = 2) {
+  sounds.playBeep(580, 0.06);
+  subState.level = level;
+  switchScreen('screen-subtraction');
+  updateSubLevelTabs();
+  startSubtractionGame(level);
+}
+
+function selectSubLevel(level) {
+  sounds.playBeep(520, 0.05);
+  subState.level = level;
+  updateSubLevelTabs();
+  startSubtractionGame(level);
+}
+
+function updateSubLevelTabs() {
+  const tabs = document.querySelectorAll('.sub-tab-btn');
+  tabs.forEach(btn => {
+    const lvl = parseInt(btn.getAttribute('data-level'), 10);
+    if (lvl === subState.level) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+
+  const badge = document.getElementById('sub-level-badge');
+  if (badge) {
+    const titles = {
+      1: '1단계: 100의 마법 (100 - XX)',
+      2: '2단계: 가운데 0 변신 ⭐ (핵심 특훈)',
+      3: '3단계: 연속 0 끝판왕 (1004 - 368)',
+      4: '4단계: 실전 10문제 도전'
+    };
+    badge.textContent = titles[subState.level] || '마법의 0 뺄셈';
+  }
+}
+
+function toggleMagicHint() {
+  subState.isHintActive = !subState.isHintActive;
+  sounds.playBeep(subState.isHintActive ? 640 : 440, 0.05);
+  const statusEl = document.getElementById('hint-status-text');
+  if (statusEl) {
+    statusEl.textContent = subState.isHintActive ? '켜짐 💡' : '꺼짐 🔒';
+  }
+  renderSubQuestion();
+}
+
+function exitSubtractionToHome() {
+  sounds.playBeep(480, 0.05);
+  subState.isProcessing = false;
+  goHome();
+}
+
+// 2. 0 뺄셈 문제 자동 생성기 (초등 교육과정 특화)
+function generateSubProblems(level) {
+  const list = [];
+  const usedKeys = new Set();
+
+  while (list.length < 10) {
+    let top = 0;
+    let bot = 0;
+
+    let curLevel = level;
+    if (level === 4) {
+      // 4단계 실전: 1단계 2문항, 2단계 6문항, 3단계 2문항
+      if (list.length < 2) curLevel = 1;
+      else if (list.length < 8) curLevel = 2;
+      else curLevel = 3;
+    }
+
+    if (curLevel === 1) {
+      // 1단계: 100의 마법 (100, 200, 300, 400, 500, 600, 700, 800, 900 - XX)
+      const hChoices = [100, 200, 300, 400, 500, 600, 700, 800, 900];
+      top = hChoices[Math.floor(Math.random() * hChoices.length)];
+      const botTens = Math.floor(Math.random() * 8) + 1; // 1~8
+      const botOnes = Math.floor(Math.random() * 9) + 1; // 1~9
+      bot = botTens * 10 + botOnes;
+    } else if (curLevel === 2) {
+      // 2단계: 가운데 0 변신 (X0X - XXX) [가장 중요한 핵심 특훈!]
+      // 십의 자리가 0이고, 일의 자리는 반드시 받아내림이 발생하여 0이 9로 변신함!
+      const topH = Math.floor(Math.random() * 8) + 2; // 2~9
+      const topO = Math.floor(Math.random() * 7); // 0~6
+      top = topH * 100 + topO;
+
+      const botH = Math.floor(Math.random() * (topH - 1)) + 1; // 1 ~ topH-1
+      const botT = Math.floor(Math.random() * 8) + 1; // 1~8
+      const botO = Math.floor(Math.random() * (9 - topO)) + (topO + 1); // topO+1 ~ 9 (반드시 topO < botO)
+      bot = botH * 100 + botT * 10 + botO;
+    } else {
+      // 3단계: 연속 0 끝판왕 (100X - XXX 또는 200X - XXX 또는 1000 - XXX)
+      const topBase = Math.random() < 0.5 ? 1000 : 2000;
+      const topO = Math.floor(Math.random() * 6); // 0~5
+      top = topBase + topO;
+
+      const botH = Math.floor(Math.random() * 7) + 2; // 2~8
+      const botT = Math.floor(Math.random() * 8) + 1; // 1~8
+      const botO = Math.floor(Math.random() * (9 - topO)) + (topO + 1); // topO+1 ~ 9
+      bot = botH * 100 + botT * 10 + botO;
+    }
+
+    const key = `${top}-${bot}`;
+    if (!usedKeys.has(key) && top > bot) {
+      usedKeys.add(key);
+      const diff = top - bot;
+      const parsed = parseSubProblemData(top, bot, diff);
+      list.push(parsed);
+    }
+  }
+
+  return list;
+}
+
+// 3. 문제 단계별 자릿수 및 받아내림 변신 상세 분석
+function parseSubProblemData(top, bot, ans) {
+  const topStr = top.toString();
+  const botStr = bot.toString();
+  const len = topStr.length; // 3 또는 4
+
+  const paddedBotStr = botStr.padStart(len, '0');
+  const digitsTop = topStr.split('').map(d => parseInt(d, 10));
+  const digitsBot = paddedBotStr.split('').map(d => parseInt(d, 10));
+
+  // 받아내림 시뮬레이션
+  const borrowBadge = new Array(len).fill(null);
+  const isSlashed = new Array(len).fill(false);
+  const intermediate10 = new Array(len).fill(false);
+  const workingTop = [...digitsTop];
+
+  for (let i = len - 1; i >= 0; i--) {
+    if (workingTop[i] < digitsBot[i]) {
+      // 왼쪽에서 빌려올 자리 탐색
+      let k = i - 1;
+      while (k >= 0 && workingTop[k] === 0) {
+        k--;
+      }
+
+      if (k >= 0) {
+        // k번째 자리에서 1 감소
+        workingTop[k] -= 1;
+        isSlashed[k] = true;
+        borrowBadge[k] = workingTop[k];
+
+        // k와 i 사이의 모든 0들은 10이 되었다가 1을 주어 9로 변신!
+        for (let m = k + 1; m < i; m++) {
+          workingTop[m] = 9;
+          isSlashed[m] = true;
+          borrowBadge[m] = 9;
+          intermediate10[m] = true; // 10 -> 9 변신 시각화
+        }
+
+        // i번째 자리는 10을 받아 더해짐
+        isSlashed[i] = true;
+        borrowBadge[i] = workingTop[i] + 10;
+        workingTop[i] += 10;
+      }
+    }
+  }
+
+  // 삐약이 말풍선 설명 문구 생성
+  let explText = '';
+  if (len === 3) {
+    const oTop = digitsTop[2];
+    const oBot = digitsBot[2];
+    const tTop = digitsTop[1];
+    const tBot = digitsBot[1];
+    const hTop = digitsTop[0];
+    const hBot = digitsBot[0];
+
+    explText = `<strong>🐥 삐약이의 마법 설명:</strong><br>` +
+      `① 일의 자리: <strong>${oTop}</strong>에서 ${oBot}을 뺄 수 없어서 옆집을 보니 <strong>0</strong>이에요!<br>` +
+      `② 백의 자리 <strong>${hTop}</strong>에서 10을 빌려와 십의 자리가 10이 된 뒤, 일의 자리에 1을 주니까 <strong>0이 9로 변신</strong>해요! ✨<br>` +
+      `③ 일의 자리: <strong>${borrowBadge[2]} − ${oBot} = ${ans % 10}</strong>, ` +
+      `십의 자리: <strong>9 − ${tBot} = ${Math.floor((ans % 100) / 10)}</strong>, ` +
+      `백의 자리: <strong>${borrowBadge[0]} − ${hBot} = ${Math.floor(ans / 100)}</strong>!`;
+  } else {
+    explText = `<strong>🐥 삐약이의 마법 설명:</strong><br>` +
+      `연속 0의 마법! 앞자리에서 빌려올 때 가운데 있는 모든 <strong>0들은 전부 9</strong>로 변신하고, 맨 끝 일의 자리만 <strong>10을 더해줘요!</strong> ✨<br>` +
+      `정답은 <strong>${ans}</strong>!`;
+  }
+
+  return {
+    top,
+    bot,
+    ans,
+    len,
+    digitsTop,
+    digitsBot,
+    borrowBadge,
+    isSlashed,
+    intermediate10,
+    explText
+  };
+}
+
+// 4. 게임 시작 및 문제 로드
+function startSubtractionGame(level = subState.level) {
+  subState.level = level;
+  subState.questions = generateSubProblems(level);
+  subState.currentIndex = 0;
+  subState.correctCount = 0;
+  subState.currentInput = '';
+  subState.startTime = Date.now();
+  subState.isProcessing = false;
+
+  renderSubQuestion();
+}
+
+function renderSubQuestion() {
+  const q = subState.questions[subState.currentIndex];
+  if (!q) return;
+
+  // 카운터 갱신
+  const counterEl = document.getElementById('sub-q-counter');
+  if (counterEl) counterEl.textContent = `${subState.currentIndex + 1} / 10`;
+
+  // 피드백 초기화
+  const fbEl = document.getElementById('sub-feedback');
+  if (fbEl) {
+    fbEl.textContent = '';
+    fbEl.className = 'sub-feedback';
+  }
+
+  // 자릿수 헤더 (천의 자리 표시 여부)
+  const lblTh = document.getElementById('lbl-th');
+  if (lblTh) {
+    lblTh.style.display = q.len === 4 ? 'inline-block' : 'none';
+  }
+
+  // 1. 받아내림 변신 뱃지 줄
+  const borrowRow = document.getElementById('sub-borrow-row');
+  let borrowHtml = '<span class="op-space"></span>';
+  for (let i = 0; i < q.len; i++) {
+    const colClass = getColClass(i, q.len);
+    if (subState.isHintActive && q.borrowBadge[i] !== null) {
+      if (q.intermediate10[i]) {
+        borrowHtml += `
+          <div class="col-cell ${colClass}">
+            <span class="borrow-badge intermediate-10">10</span>
+            <span class="borrow-badge zero-to-nine">${q.borrowBadge[i]}</span>
+          </div>`;
+      } else {
+        borrowHtml += `
+          <div class="col-cell ${colClass}">
+            <span class="borrow-badge">${q.borrowBadge[i]}</span>
+          </div>`;
+      }
+    } else {
+      borrowHtml += `<div class="col-cell ${colClass}"></div>`;
+    }
+  }
+  if (borrowRow) borrowRow.innerHTML = borrowHtml;
+
+  // 2. 위쪽 수 줄
+  const topRow = document.getElementById('sub-top-row');
+  let topHtml = '<span class="op-space"></span>';
+  for (let i = 0; i < q.len; i++) {
+    const colClass = getColClass(i, q.len);
+    const slashedClass = (subState.isHintActive && q.isSlashed[i]) ? 'slashed' : '';
+    topHtml += `
+      <div class="digit-box col-cell ${colClass} ${slashedClass}">
+        <span class="digit-val">${q.digitsTop[i]}</span>
+      </div>`;
+  }
+  if (topRow) topRow.innerHTML = topHtml;
+
+  // 3. 아래쪽 수 줄 (연산자 포함)
+  const botRow = document.getElementById('sub-bottom-row');
+  let botHtml = '<span class="op-sign">−</span>';
+  for (let i = 0; i < q.len; i++) {
+    const colClass = getColClass(i, q.len);
+    const val = (i === 0 && q.digitsBot[i] === 0) ? '' : q.digitsBot[i];
+    botHtml += `
+      <div class="digit-box col-cell ${colClass}">
+        <span class="digit-val">${val}</span>
+      </div>`;
+  }
+  if (botRow) botRow.innerHTML = botHtml;
+
+  // 4. 정답 입력 줄
+  updateSubAnswerRow(q);
+
+  // 5. 말풍선 안내 문구
+  const bubbleContent = document.getElementById('bubble-content-text');
+  if (bubbleContent) {
+    if (subState.isHintActive) {
+      bubbleContent.innerHTML = q.explText;
+    } else {
+      bubbleContent.innerHTML = `<strong>🐥 삐약이의 마법 비법:</strong><br>` +
+        `가운데 <strong>0</strong>은 무조건 <strong>9</strong>로 변신하고, 맨 끝 일의 자리에는 <strong>10을 더해줘요!</strong> 머릿속으로 변신을 떠올려보세요 ✨<br>` +
+        `(헷갈리면 언제든 상단의 <strong>[🪄 마법 힌트]</strong>를 누르면 변신이 짠! 나타나요)`;
+    }
+  }
+
+  updateSubInputDisplay();
+}
+
+function getColClass(idx, len) {
+  if (len === 4) {
+    const classes = ['col-th', 'col-h', 'col-t', 'col-o'];
+    return classes[idx] || '';
+  } else {
+    const classes = ['col-h', 'col-t', 'col-o'];
+    return classes[idx] || '';
+  }
+}
+
+function updateSubAnswerRow(q) {
+  const ansRow = document.getElementById('sub-answer-row');
+  if (!ansRow) return;
+
+  const currentInputStr = subState.currentInput;
+  const inputDigits = currentInputStr.split('');
+
+  // 오른쪽 정렬하여 자릿수 채우기
+  let ansHtml = '<span class="op-space"></span>';
+  const startOffset = q.len - inputDigits.length;
+
+  for (let i = 0; i < q.len; i++) {
+    const colClass = getColClass(i, q.len);
+    let digitChar = '?';
+    let isFilled = false;
+
+    if (i >= startOffset && inputDigits.length > 0) {
+      digitChar = inputDigits[i - startOffset];
+      isFilled = true;
+    }
+
+    ansHtml += `
+      <div class="digit-box answer-box col-cell ${colClass} ${isFilled ? 'filled' : ''}" id="sub-ans-box-${i}">
+        ${digitChar}
+      </div>`;
+  }
+
+  ansRow.innerHTML = ansHtml;
+}
+
+// 5. 키패드 조작 및 정답 확인
+function pressSubKey(key) {
+  if (subState.isProcessing) return;
+  sounds.playBeep(480, 0.04);
+
+  if (key === 'clear') {
+    subState.currentInput = subState.currentInput.slice(0, -1);
+  } else if (typeof key === 'number') {
+    const q = subState.questions[subState.currentIndex];
+    const maxLen = q ? q.len : 4;
+    if (subState.currentInput.length < maxLen) {
+      subState.currentInput += key.toString();
+    }
+  }
+
+  updateSubInputDisplay();
+  const q = subState.questions[subState.currentIndex];
+  if (q) updateSubAnswerRow(q);
+}
+
+function updateSubInputDisplay() {
+  const inputEl = document.getElementById('sub-current-input');
+  if (inputEl) {
+    inputEl.textContent = subState.currentInput || '';
+  }
+}
+
+function submitSubAnswer() {
+  if (subState.isProcessing) return;
+  if (!subState.currentInput) {
+    sounds.playBeep(320, 0.08);
+    return;
+  }
+
+  const q = subState.questions[subState.currentIndex];
+  if (!q) return;
+
+  const userNum = parseInt(subState.currentInput, 10);
+  const fbEl = document.getElementById('sub-feedback');
+
+  if (userNum === q.ans) {
+    // 정답!
+    subState.isProcessing = true;
+    subState.correctCount++;
+    sounds.playCorrect();
+
+    // 힌트가 꺼져있었다면 정답일 때 마법 변신을 시각적으로 보여줌
+    if (!subState.isHintActive) {
+      subState.isHintActive = true;
+      renderSubQuestion();
+    }
+
+    if (fbEl) {
+      fbEl.textContent = '🎉 딩동댕! 마법의 0 뺄셈 대성공!';
+      fbEl.className = 'sub-feedback correct';
+    }
+
+    // 1초 후 다음 문제
+    setTimeout(() => {
+      subState.isProcessing = false;
+      subState.currentInput = '';
+      subState.currentIndex++;
+
+      if (subState.currentIndex >= subState.questions.length) {
+        finishSubtractionGame();
+      } else {
+        renderSubQuestion();
+      }
+    }, 1100);
+
+  } else {
+    // 오답!
+    sounds.playWrong();
+    if (fbEl) {
+      fbEl.textContent = '앗, 다시 한 번 볼까요? 🪄 마법 힌트의 변신을 살펴보세요!';
+      fbEl.className = 'sub-feedback wrong';
+    }
+
+    // 오답 시 아이가 당황하지 않도록 자동으로 마법 힌트 켜주기
+    if (!subState.isHintActive) {
+      subState.isHintActive = true;
+      renderSubQuestion();
+    }
+
+    // 입력값 리셋
+    subState.currentInput = '';
+    updateSubInputDisplay();
+    updateSubAnswerRow(q);
+  }
+}
+
+// 6. 10문제 완료 및 보상 처리 (도장, 별, 쿠폰 연동)
+function finishSubtractionGame() {
+  sounds.playFanfare();
+  if (confetti) confetti.megaBurst();
+
+  // 별점 10점 지급
+  state.stars += 10;
+
+  // 도장 진행도 +1
+  state.stampProgress.subtraction = (state.stampProgress.subtraction || 0) + 1;
+  const subCount = state.stampProgress.subtraction;
+  let isEarnedBoardStamp = false;
+
+  let stampProgressMsg = '';
+  if (subCount >= 3) {
+    isEarnedBoardStamp = true;
+    state.stampProgress.subtraction = 0;
+    state.stamps.push({
+      type: 'gold',
+      title: '0 뺄셈 특훈 완주',
+      date: new Date().toLocaleDateString('ko-KR')
+    });
+    stampProgressMsg = '🎉 <strong>0 뺄셈 특훈 3세트 완주 대성공!</strong> 도장판에 도장이 쾅 찍혔어요! 💮';
+  } else {
+    stampProgressMsg = `💮 도장판 도장까지: <strong>${subCount} / 3세트 완료</strong> (앞으로 ${3 - subCount}세트 더 풀면 도장 쾅!)`;
+  }
+
+  saveUserData();
+  updateUserBadge();
+  updateHeaderStampCount();
+  updateStampProgressUI();
+
+  state.lastCompletedMode = 'subtraction';
+
+  // 결과 화면 전환
+  switchScreen('screen-result');
+
+  document.getElementById('res-correct').textContent = subState.correctCount;
+  document.getElementById('res-total').textContent = subState.questions.length;
+  document.getElementById('res-stars').textContent = 10;
+  document.getElementById('res-max-combo').textContent = subState.correctCount;
+
+  const elapsedSec = ((Date.now() - subState.startTime) / 1000).toFixed(1);
+  document.getElementById('res-elapsed-time').textContent = `${elapsedSec}초`;
+
+  document.getElementById('result-title').textContent = '마법의 0 뺄셈 특훈 완료! 🪄';
+  document.getElementById('result-subtitle').textContent = '0에서 빌려오는 받아내림을 멋지게 해냈어요!';
+
+  const bannerEl = document.getElementById('res-stamp-progress-banner');
+  if (bannerEl) bannerEl.innerHTML = stampProgressMsg;
+
+  // 결과 화면 칭찬 도장 적용
+  const stampSub = isEarnedBoardStamp ? '3세트 완주 💮' : `${subCount}/3세트 달성`;
+  applyStampToResult('gold', '0 뺄셈 마스터', stampSub, isEarnedBoardStamp);
+
+  // 랭킹 보드 숨기기 (구구단 전용 랭킹이므로)
+  const rankCard = document.getElementById('result-top5-card');
+  if (rankCard) rankCard.style.display = 'none';
 }

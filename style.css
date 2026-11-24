@@ -249,16 +249,23 @@ body {
   transform: translateY(-2px);
 }
 
+/* 특별 모드 2열 배너 그리드 */
+.special-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
 /* 리듬 외우기 모드 메인 배너 */
 .rhythm-hero-card {
   background: linear-gradient(135deg, #FFF9C4 0%, #FFE082 100%);
   border: 3px solid #FFCA28;
   border-radius: var(--radius-lg);
-  padding: 16px 22px;
+  padding: 14px 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
   cursor: pointer;
   box-shadow: 0 8px 20px rgba(255, 179, 0, 0.2);
   transition: transform 0.12s, box-shadow 0.12s;
@@ -269,6 +276,101 @@ body {
 }
 .rhythm-hero-card:active {
   transform: scale(0.99);
+}
+
+/* 마법의 0 뺄셈 특훈 메인 배너 */
+.subtraction-hero-card {
+  background: linear-gradient(135deg, #F3E8FF 0%, #E9D5FF 100%);
+  border: 3px solid #C084FC;
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(192, 132, 252, 0.2);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.subtraction-hero-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(192, 132, 252, 0.3);
+}
+.subtraction-hero-card:active {
+  transform: scale(0.99);
+}
+
+.subtraction-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.subtraction-icon {
+  font-size: 36px;
+  width: 52px;
+  height: 52px;
+  background: white;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: var(--shadow-soft);
+  flex-shrink: 0;
+}
+
+.subtraction-badge {
+  display: inline-block;
+  background: #9333EA;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-bottom: 3px;
+}
+
+.subtraction-info h2 {
+  font-size: 18px;
+  color: #37474F;
+  margin-bottom: 2px;
+}
+
+.subtraction-info p {
+  font-size: 12px;
+  color: #6B21A8;
+}
+
+.subtraction-hero-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.subtraction-stamp-pill {
+  background: rgba(255, 255, 255, 0.9);
+  color: #7E22CE;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 3px 10px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.btn-subtraction-start {
+  background: #9333EA;
+  color: white;
+  border: none;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: bold;
+  padding: 9px 16px;
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+  animation: pulse 1.6s infinite;
+  white-space: nowrap;
 }
 
 .rhythm-hero-left {
@@ -2027,7 +2129,7 @@ body {
 }
 .stamp-progress-dashboard {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
   gap: 8px;
   margin-bottom: 14px;
 }
@@ -2056,11 +2158,420 @@ body {
   color: #2E7D32;
 }
 
+/* ================= 3-1. 마법의 0 뺄셈 특훈 전용 스타일 ================= */
+#screen-subtraction {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+}
+#screen-subtraction.active {
+  display: flex;
+}
+
+.sub-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.sub-level-tabs {
+  display: flex;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 4px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.sub-tab-btn {
+  border: none;
+  background: transparent;
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: bold;
+  color: #64748b;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sub-tab-btn.active {
+  background: #9333ea;
+  color: white;
+  box-shadow: 0 3px 10px rgba(147, 51, 234, 0.35);
+}
+
+.sub-stats {
+  display: flex;
+  align-items: center;
+}
+
+.sub-counter {
+  font-size: 1.05rem;
+  font-weight: bold;
+  background: white;
+  padding: 6px 14px;
+  border-radius: 999px;
+  color: #7e22ce;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.sub-body-wrap {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 18px;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.sub-board-card {
+  background: white;
+  border-radius: 24px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+  border: 3px solid #f3e8ff;
+  position: relative;
+  overflow-y: auto;
+}
+
+.sub-board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.sub-level-badge {
+  font-size: 0.92rem;
+  font-weight: bold;
+  color: #7e22ce;
+  background: #f5f3ff;
+  padding: 4px 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd6fe;
+}
+
+.btn-magic-hint-toggle {
+  background: #fef08a;
+  border: 2px solid #facc15;
+  color: #854d0e;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 0.92rem;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(250, 204, 21, 0.3);
+  transition: transform 0.1s;
+}
+.btn-magic-hint-toggle:active {
+  transform: scale(0.96);
+}
+
+/* 세로 계산식 칠판 판 */
+.vertical-calc-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 6px 0 10px;
+  background: #faf5ff;
+  border-radius: 18px;
+  border: 2px dashed #d8b4fe;
+  padding: 12px 20px;
+}
+
+.place-labels,
+.borrow-row,
+.math-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 270px;
+}
+
+.place-labels {
+  color: #a855f7;
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.col-cell {
+  width: 60px;
+  text-align: center;
+  position: relative;
+}
+
+.op-space, .op-sign {
+  width: 50px;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #ef4444;
+  text-align: center;
+}
+
+/* 받아내림 변신 뱃지 */
+.borrow-row {
+  height: 44px;
+  margin-bottom: 2px;
+}
+
+.borrow-badge {
+  display: inline-block;
+  background: #3b82f6;
+  color: white;
+  font-size: 1.05rem;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+  animation: popBadge 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.borrow-badge.zero-to-nine {
+  background: #ef4444 !important;
+  animation: pulseBadge 1s infinite alternate;
+}
+
+.borrow-badge.intermediate-10 {
+  background: #94a3b8 !important;
+  font-size: 0.76rem;
+  text-decoration: line-through;
+  margin-right: 2px;
+  opacity: 0.85;
+}
+
+@keyframes popBadge {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulseBadge {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.12); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5); }
+}
+
+/* 숫자 박스 & 빗금 */
+.digit-box {
+  width: 60px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.6rem;
+  font-weight: 900;
+  color: #1e293b;
+  position: relative;
+}
+
+.digit-box.slashed::after {
+  content: '';
+  position: absolute;
+  width: 80%;
+  height: 4px;
+  background: #ef4444;
+  transform: rotate(-45deg);
+  border-radius: 2px;
+  animation: slashDraw 0.2s ease-out forwards;
+}
+
+@keyframes slashDraw {
+  0% { width: 0%; opacity: 0; }
+  100% { width: 80%; opacity: 1; }
+}
+
+/* 가로 구분선 */
+.math-line {
+  width: 280px;
+  height: 4px;
+  background: #334155;
+  border-radius: 2px;
+  margin: 4px 0 8px;
+}
+
+/* 정답 입력 칸 */
+.answer-row .digit-box.answer-box {
+  background: white;
+  border: 3px solid #c084fc;
+  border-radius: 12px;
+  color: #7e22ce;
+  font-size: 2.2rem;
+  height: 54px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+  transition: all 0.15s ease;
+}
+
+.answer-row .digit-box.answer-box.active-focus {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+}
+
+.answer-row .digit-box.answer-box.filled {
+  background: #faf5ff;
+  font-weight: 900;
+}
+
+/* 마법 말풍선 */
+.magic-expl-bubble {
+  background: #fdf4ff;
+  border: 2px solid #e879f9;
+  border-radius: 16px;
+  padding: 10px 14px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-top: 4px;
+}
+
+.bubble-avatar {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.bubble-content {
+  font-size: 0.9rem;
+  color: #701a75;
+  line-height: 1.45;
+}
+
+.bubble-content strong {
+  color: #c026d3;
+}
+
+/* 피드백 */
+.sub-feedback {
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 900;
+  min-height: 28px;
+  margin-top: 6px;
+}
+.sub-feedback.correct {
+  color: #16a34a;
+}
+.sub-feedback.wrong {
+  color: #dc2626;
+  animation: shake 0.4s;
+}
+
+/* 오른쪽 키패드 패널 */
+.sub-keypad-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sub-input-display {
+  background: white;
+  border: 3px solid #cbd5e1;
+  border-radius: 16px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+}
+
+.sub-input-label {
+  font-size: 1.05rem;
+  font-weight: bold;
+  color: #64748b;
+}
+
+.sub-input-val {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #7e22ce;
+  letter-spacing: 4px;
+  min-width: 70px;
+  text-align: right;
+}
+
+.sub-input-cursor {
+  font-size: 1.8rem;
+  color: #a855f7;
+  animation: blink 1s infinite;
+}
+
+.sub-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  flex: 1;
+}
+
+.sub-keypad .key-btn {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  font-size: 1.8rem;
+  font-family: inherit;
+  font-weight: 900;
+  color: #334155;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  transition: all 0.1s ease;
+  min-height: 52px;
+}
+.sub-keypad .key-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+}
+
+.sub-keypad .key-clear {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #dc2626;
+  font-size: 1.15rem;
+}
+
+.sub-keypad .key-enter {
+  background: #9333ea;
+  border-color: #7e22ce;
+  color: white;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.35);
+}
+.sub-keypad .key-enter:active {
+  background: #7e22ce;
+}
+
+.sub-tip-card {
+  background: #fefce8;
+  border: 1.5px solid #fef08a;
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+.sub-tip-title {
+  font-size: 0.84rem;
+  font-weight: bold;
+  color: #a16207;
+  margin-bottom: 2px;
+}
+.sub-tip-text {
+  font-size: 0.8rem;
+  color: #713f12;
+  line-height: 1.35;
+}
+
 @media (max-width: 768px) {
   #app {
     padding: 14px;
     height: 100vh;
     border-radius: 0;
+  }
+  .special-hero-grid {
+    grid-template-columns: 1fr;
   }
   .game-landscape-body {
     flex-direction: column;
@@ -2072,6 +2583,27 @@ body {
   .rhythm-rank-panel {
     width: 100%;
     max-width: 380px;
+  }
+  .sub-body-wrap {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+  .sub-board-card {
+    padding: 12px;
+  }
+  .digit-box {
+    width: 46px;
+    height: 46px;
+    font-size: 2rem;
+  }
+  .place-labels, .borrow-row, .math-row {
+    width: 220px;
+  }
+  .col-cell {
+    width: 46px;
+  }
+  .math-line {
+    width: 230px;
   }
   .mode-grid {
     grid-template-columns: 1fr;
